@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\WalletController;
 use App\Http\Controllers\Api\BeneficiaryController;
+use App\Http\Controllers\Api\ChatController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -28,7 +30,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    // User Search
+    Route::get('/users/search', [UserController::class, 'search']);
 
+    // Chat Routes
+    Route::get('/chat/users', [ChatController::class, 'chatUsers']);
+    Route::get('/chat/{userId}', [ChatController::class, 'getChat']);
+    Route::post('/chat/send', [ChatController::class, 'sendMessage']);
     // Wallet Routes
     Route::get('/wallet/balance', [WalletController::class, 'balance']);
     Route::post('/wallet/add-money', [WalletController::class, 'addMoney']);

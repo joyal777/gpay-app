@@ -44,10 +44,13 @@ export default function ProfileScreen({ navigation }: any) {
         >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Profile</Text>
-          <TouchableOpacity onPress={handleLogout}>
-            <Ionicons name="log-out-outline" size={24} color="#ff4444" />
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+                <Ionicons name="arrow-back" size={24} color="#333" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Profile</Text>
+            <TouchableOpacity onPress={handleLogout}>
+                <Ionicons name="log-out-outline" size={24} color="#ff4444" />
+            </TouchableOpacity>
         </View>
 
         {/* Profile Card */}

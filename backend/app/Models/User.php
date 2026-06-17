@@ -59,4 +59,11 @@ class User extends Authenticatable
             ->orWhere('receiver_id', $this->id)
             ->orderBy('created_at', 'desc');
     }
+
+    public function messages()
+    {
+        return Message::where('sender_id', $this->id)
+            ->orWhere('receiver_id', $this->id)
+            ->orderBy('created_at', 'desc');
+    }
 }
