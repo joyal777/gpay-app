@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -119,6 +120,15 @@ class WalletController extends Controller
             'type' => 'debit',
             'status' => 'completed',
             'note' => $request->note,
+        ]);
+
+        Message::create([
+            'sender_id' => $sender->id,
+            'receiver_id' => $receiverWallet->user_id,
+            'amount' => $request->amount,
+            'message' => $request->note ?? '💸 Payment sent',
+            'type' => 'payment',
+            'status' => 'completed',
         ]);
 
         return response()->json([
