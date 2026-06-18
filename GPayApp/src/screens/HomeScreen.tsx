@@ -22,6 +22,8 @@ export default function HomeScreen({ navigation }: any) {
   const [searchQuery, setSearchQuery] = useState('');
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [chatUsers, setChatUsers] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useFocusEffect(
   useCallback(() => {
@@ -40,6 +42,25 @@ export default function HomeScreen({ navigation }: any) {
       // Silent fail - no transactions yet
       setRecentTransactions([]);
     }
+};
+
+const searchUsers = async (query: string) => {
+  setSearchQuery(query);
+  
+  if (query.length < 1) {
+    setSearchResults([]);
+    setShowDropdown(false);
+    return;
+  }
+
+  try {
+    const response = await api.get(`/users/search?q=${query}`);
+    setSearchResults(response.data.users);
+    setShowDropdown(response.data.users.length > 0);
+  } catch (error) {
+    setSearchResults([]);
+    setShowDropdown(false);
+  }
 };
 
 const loadChatUsers = async () => {
@@ -70,15 +91,63 @@ const loadChatUsers = async () => {
         {/* TOP SECTION WITH BACKGROUND */}
         <View style={styles.topSection}>
           {/* Search Bar */}
-          <View style={styles.searchContainer}>
-            <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search by UPI ID or phone number"
-              placeholderTextColor="#999"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
+          {/* Search Bar */}
+          {/* Search Bar with Dropdown */}
+          <View style={styles.searchWrapper}>
+            <View style={styles.searchContainer}>
+              <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search by UPI ID or phone number"
+                placeholderTextColor="#999"
+                value={searchQuery}
+                onChangeText={searchUsers}
+                onFocus={() => {
+                  if (searchResults.length > 0) setShowDropdown(true);
+                }}
+                onBlur={() => {
+                  setTimeout(() => setShowDropdown(false), 200);
+                }}
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => {
+                  setSearchQuery('');
+                  setSearchResults([]);
+                  setShowDropdown(false);
+                }}>
+                  <Ionicons name="close-circle" size={20} color="#fff" />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Dropdown - Positioned Absolutely */}
+            {showDropdown && (
+              <View style={styles.dropdown}>
+                {searchResults.map((item: any) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setShowDropdown(false);
+                      setSearchQuery('');
+                      setSearchResults([]);
+                      navigation.navigate('Chat', { chatUser: item });
+                    }}
+                  >
+                    <View style={styles.dropdownPic}>
+                      <Text style={styles.dropdownPicText}>
+                        {item.name?.charAt(0)}
+                      </Text>
+                    </View>
+                    <View style={styles.dropdownInfo}>
+                      <Text style={styles.dropdownName}>{item.name}</Text>
+                      <Text style={styles.dropdownUpi}>{item.upi_id}</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color="#999" />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </View>
 
           {/* Profile Card */}
@@ -430,4 +499,59 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
     },
+
+    searchWrapper: {
+      position: 'relative',
+      zIndex: 10,
+    },
+    dropdown: {
+      position: 'absolute',
+      top: 50, // Height of search bar
+      left: 0,
+      right: 0,
+      backgroundColor: '#fff',
+      borderRadius: 12,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 8,
+      zIndex: 100,
+      maxHeight: 300,
+    },
+    dropdownItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 14,
+      borderBottomWidth: 1,
+      borderBottomColor: '#f0f0f0',
+      gap: 12,
+    },
+    dropdownPic: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: '#1a73e8',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    dropdownPicText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    dropdownInfo: {
+      flex: 1,
+    },
+    dropdownName: {
+      fontSize: 15,
+      fontWeight: '500',
+      color: '#333',
+    },
+    dropdownUpi: {
+      fontSize: 12,
+      color: '#999',
+      marginTop: 2,
+    },
+
 });
