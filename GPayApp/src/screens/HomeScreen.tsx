@@ -133,9 +133,16 @@ const loadChatUsers = async () => {
                     }}
                   >
                     <View style={styles.dropdownPic}>
-                      <Text style={styles.dropdownPicText}>
-                        {item.name?.charAt(0)}
-                      </Text>
+                      {item.profile_pic ? (
+                        <Image 
+                          source={{ uri: IMAGE_BASE + item.profile_pic }} 
+                          style={styles.dropdownPicImage} 
+                        />
+                      ) : (
+                        <Text style={styles.dropdownPicText}>
+                          {item.name?.charAt(0)}
+                        </Text>
+                      )}
                     </View>
                     <View style={styles.dropdownInfo}>
                       <Text style={styles.dropdownName}>{item.name}</Text>
@@ -563,6 +570,11 @@ const styles = StyleSheet.create({
   height: 55,
   borderRadius: 27.5,
   marginBottom: 5,
+},
+dropdownPicImage: {
+  width: 40,
+  height: 40,
+  borderRadius: 20,
 },
 
 });
