@@ -105,9 +105,6 @@ const loadChatUsers = async () => {
                 onFocus={() => {
                   if (searchResults.length > 0) setShowDropdown(true);
                 }}
-                onBlur={() => {
-                  setTimeout(() => setShowDropdown(false), 200);
-                }}
               />
               {searchQuery.length > 0 && (
                 <TouchableOpacity onPress={() => {
