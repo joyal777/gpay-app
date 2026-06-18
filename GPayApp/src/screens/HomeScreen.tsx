@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { useFocusEffect } from '@react-navigation/native';
+import { IMAGE_BASE } from '../services/config';
 
 export default function HomeScreen({ navigation }: any) {
   const { user, refreshProfile } = useAuth();
@@ -154,7 +155,7 @@ const loadChatUsers = async () => {
           >
             <View style={styles.profileLeft}>
               {user?.profile_pic ? (
-                <Image source={{ uri: user.profile_pic }} style={styles.profilePic} />
+                <Image source={{ uri: IMAGE_BASE + user.profile_pic }} style={styles.profilePic} />
               ) : (
                 <View style={styles.profilePicPlaceholder}>
                   <Text style={styles.profilePicText}>
@@ -186,13 +187,20 @@ const loadChatUsers = async () => {
                 data={chatUsers}
                 renderItem={({ item }) => (
                 <TouchableOpacity 
-                    style={styles.personItem}
-                    onPress={() => navigation.navigate('Chat', { chatUser: item })}
+                  style={styles.personItem}
+                  onPress={() => navigation.navigate('Chat', { chatUser: item })}
                 >
+                  {item.profile_pic ? (
+                    <Image 
+                      source={{ uri: IMAGE_BASE + item.profile_pic }} 
+                      style={styles.personPicImage} 
+                    />
+                  ) : (
                     <View style={styles.personPic}>
-                    <Text style={styles.personPicText}>{item.name?.charAt(0)}</Text>
+                      <Text style={styles.personPicText}>{item.name?.charAt(0)}</Text>
                     </View>
-                    <Text style={styles.personName} numberOfLines={1}>{item.name}</Text>
+                  )}
+                  <Text style={styles.personName} numberOfLines={1}>{item.name}</Text>
                 </TouchableOpacity>
                 )}
                 keyExtractor={(item) => item.id.toString()}
@@ -550,5 +558,11 @@ const styles = StyleSheet.create({
       color: '#999',
       marginTop: 2,
     },
+    personPicImage: {
+  width: 55,
+  height: 55,
+  borderRadius: 27.5,
+  marginBottom: 5,
+},
 
 });

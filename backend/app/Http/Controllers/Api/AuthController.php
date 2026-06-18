@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\Storage;
 class AuthController extends Controller
 {
     public function register(Request $request)
@@ -134,6 +134,41 @@ class AuthController extends Controller
             'status' => true,
             'message' => 'Profile updated successfully',
             'user' => $user->fresh(['wallet', 'beneficiaries'])
+        ]);
+    }
+
+    public function updateProfilePic(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'profile_pic' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user = $request->user();
+
+        // Delete old profile pic if exists
+        if ($user->profile_pic) {
+            $oldPath = str_replace('/storage/', '', $user->profile_pic);
+            Storage::disk('public')->delete($oldPath);
+        }
+
+        // Upload new image
+        $path = $request->file('profile_pic')->store('profile-pics', 'public');
+        $url = '/storage/' . $path;
+
+        $user->update(['profile_pic' => $url]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Profile picture updated',
+            'user' => $user->fresh(['wallet'])
         ]);
     }
 

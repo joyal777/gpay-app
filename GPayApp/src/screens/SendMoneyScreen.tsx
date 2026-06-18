@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { IMAGE_BASE } from '../services/config';
 
 export default function SendMoneyScreen({ navigation }: any) {
   const { user, refreshProfile } = useAuth();
@@ -92,7 +93,7 @@ export default function SendMoneyScreen({ navigation }: any) {
     >
         <View style={styles.userLeft}>
         {item.profile_pic ? (
-            <Image source={{ uri: item.profile_pic }} style={styles.userPic} />
+            <Image source={{ uri: IMAGE_BASE + item.profile_pic }} style={styles.userPic} />
         ) : (
             <View style={styles.userPicPlaceholder}>
             <Text style={styles.userPicText}>{item.name?.charAt(0)}</Text>
@@ -160,7 +161,7 @@ export default function SendMoneyScreen({ navigation }: any) {
           {/* Selected User */}
           <View style={styles.selectedUserCard}>
             {selectedUser.profile_pic ? (
-              <Image source={{ uri: selectedUser.profile_pic }} style={styles.bigPic} />
+              <Image source={{ uri: IMAGE_BASE + selectedUser.profile_pic }} style={styles.bigPic} />
             ) : (
               <View style={styles.bigPicPlaceholder}>
                 <Text style={styles.bigPicText}>{selectedUser.name?.charAt(0)}</Text>

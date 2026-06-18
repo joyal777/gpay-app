@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { IMAGE_BASE } from '../services/config';
 
 
 export default function ChatScreen({ navigation, route }: any) {
@@ -104,7 +105,7 @@ export default function ChatScreen({ navigation, route }: any) {
         </TouchableOpacity>
         <View style={styles.headerUser}>
           {chatUser.profile_pic ? (
-            <Image source={{ uri: chatUser.profile_pic }} style={styles.headerPic} />
+            <Image source={{ uri: IMAGE_BASE + chatUser.profile_pic }} style={styles.headerPic} />
           ) : (
             <View style={styles.headerPicPlaceholder}>
               <Text style={styles.headerPicText}>{chatUser.name?.charAt(0)}</Text>

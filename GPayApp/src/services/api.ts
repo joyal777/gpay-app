@@ -1,9 +1,12 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
-
+import { API_BASE_URL } from './config';
+// ... rest stays same
 // For Android emulator
-const API_BASE_URL = 'http://192.168.1.2:8000/api';
 
+ // Same as API but without /api
+
+// When displaying image:
 // For physical device: Replace with your computer's IP
 // Example: 'http://192.168.1.100:8000/api'
 // Run 'ipconfig' in cmd to find your IPv4 Address

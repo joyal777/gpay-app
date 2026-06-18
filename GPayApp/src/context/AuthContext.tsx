@@ -24,6 +24,7 @@ interface AuthContextType {
   register: (name: string, phone: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  updateUser: (userData: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -99,9 +100,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Error refreshing profile:', error);
     }
   };
+  const updateUser = (userData: User) => {
+    setUser(userData);
+    SecureStore.setItemAsync('userData', JSON.stringify(userData));
+  };
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, refreshProfile }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, refreshProfile, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

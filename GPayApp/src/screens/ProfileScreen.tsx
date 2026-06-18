@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import QRCode from 'react-native-qrcode-svg';
 import { useAuth } from '../context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import { IMAGE_BASE } from '../services/config';
 
 export default function ProfileScreen({ navigation }: any) {
   const { user, logout, refreshProfile } = useAuth();
@@ -57,7 +58,10 @@ export default function ProfileScreen({ navigation }: any) {
         <View style={styles.profileCard}>
           <View style={styles.avatarContainer}>
             {user?.profile_pic ? (
-              <Image source={{ uri: user.profile_pic }} style={styles.avatar} />
+              <Image 
+                source={{ uri: IMAGE_BASE + user.profile_pic }} 
+                style={styles.avatar} 
+              />
             ) : (
               <View style={styles.avatarPlaceholder}>
                 <Text style={styles.avatarText}>
@@ -71,7 +75,10 @@ export default function ProfileScreen({ navigation }: any) {
           <Text style={styles.userPhone}>+91 {user?.phone}</Text>
           <Text style={styles.userEmail}>{user?.email}</Text>
           
-          <TouchableOpacity style={styles.editButton}>
+          <TouchableOpacity 
+            style={styles.editButton}
+            onPress={() => navigation.navigate('EditProfile')}
+          >
             <Ionicons name="pencil" size={16} color="#1a73e8" />
             <Text style={styles.editButtonText}>Edit Profile</Text>
           </TouchableOpacity>
