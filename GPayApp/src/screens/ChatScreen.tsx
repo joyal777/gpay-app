@@ -76,16 +76,27 @@ export default function ChatScreen({ navigation, route }: any) {
     const isMine = item.sender_id === user?.id;
 
     if (item.type === 'payment') {
-      return (
-        <View style={[styles.paymentBubble, isMine ? styles.myPayment : styles.theirPayment]}>
-          <Text style={styles.paymentLabel}>
-            {isMine ? 'You paid' : 'Received'}
-          </Text>
-          <Text style={styles.paymentAmount}>₹{item.amount}</Text>
-          {item.message && <Text style={styles.paymentNote}>{item.message}</Text>}
-        </View>
-      );
-    }
+  return (
+    <View style={[styles.paymentBubble, isMine ? styles.myPayment : styles.theirPayment]}>
+      <View style={styles.paymentHeader}>
+        <Text style={styles.paymentEmoji}>💸</Text>
+        <Text style={styles.paymentLabel}>
+          {isMine ? 'You paid' : 'You received'}
+        </Text>
+      </View>
+      <Text style={[styles.paymentAmount, isMine ? styles.paidAmount : styles.receivedAmount]}>
+        {isMine ? '-' : '+'}₹{item.amount}
+      </Text>
+      {item.message ? (
+        <Text style={styles.paymentNote}>{item.message}</Text>
+      ) : (
+        <Text style={styles.paymentNote}>
+          {isMine ? 'Payment sent' : 'Payment received'}
+        </Text>
+      )}
+    </View>
+  );
+}
 
     return (
       <View style={[styles.messageBubble, isMine ? styles.myMessage : styles.theirMessage]}>
@@ -206,17 +217,70 @@ const styles = StyleSheet.create({
   headerName: { fontSize: 16, fontWeight: '600', color: '#333' },
   headerUpi: { fontSize: 12, color: '#999' },
   messageList: { flex: 1, padding: 15 },
-  messageBubble: { maxWidth: '75%', padding: 12, borderRadius: 18, marginBottom: 8 },
-  myMessage: { alignSelf: 'flex-end', backgroundColor: '#1a73e8' },
-  theirMessage: { alignSelf: 'flex-start', backgroundColor: '#f0f0f0' },
+  messageBubble: { 
+  maxWidth: '75%', 
+  padding: 12, 
+  borderRadius: 18, 
+  marginBottom: 8,
+},
+myMessage: { 
+  alignSelf: 'flex-end', 
+  backgroundColor: '#1a73e8',
+  borderBottomRightRadius: 4,
+},
+theirMessage: { 
+  alignSelf: 'flex-start', 
+  backgroundColor: '#f0f0f0',
+  borderBottomLeftRadius: 4,
+},
   messageText: { fontSize: 15, color: '#333' },
   myMessageText: { color: '#fff' },
-  paymentBubble: { maxWidth: '75%', padding: 15, borderRadius: 18, marginBottom: 8 },
-  myPayment: { alignSelf: 'flex-end', backgroundColor: '#e8f5e9' },
-  theirPayment: { alignSelf: 'flex-start', backgroundColor: '#f0f0f0' },
-  paymentLabel: { fontSize: 12, color: '#666' },
-  paymentAmount: { fontSize: 22, fontWeight: 'bold', color: '#2e7d32', marginVertical: 5 },
-  paymentNote: { fontSize: 13, color: '#666' },
+  paymentBubble: { 
+  maxWidth: '80%', 
+  padding: 16, 
+  borderRadius: 20, 
+  marginBottom: 8,
+  minWidth: 200,
+},
+myPayment: { 
+  alignSelf: 'flex-end', 
+  backgroundColor: '#e8f5e9',
+  borderBottomRightRadius: 4,
+},
+theirPayment: { 
+  alignSelf: 'flex-start', 
+  backgroundColor: '#f0f4ff',
+  borderBottomLeftRadius: 4,
+},
+  paymentHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 8,
+  gap: 6,
+},
+paymentEmoji: {
+  fontSize: 18,
+},
+paymentLabel: { 
+  fontSize: 13, 
+  color: '#666',
+  fontWeight: '500',
+},
+paymentAmount: { 
+  fontSize: 24, 
+  fontWeight: 'bold',
+  marginBottom: 6,
+},
+paidAmount: {
+  color: '#e53935',
+},
+receivedAmount: {
+  color: '#2e7d32',
+},
+paymentNote: { 
+  fontSize: 12, 
+  color: '#999',
+},
   emptyChat: { alignItems: 'center', paddingTop: 80 },
   emptyText: { fontSize: 18, color: '#999', marginTop: 15 },
   emptySubtext: { fontSize: 13, color: '#ccc', marginTop: 5 },

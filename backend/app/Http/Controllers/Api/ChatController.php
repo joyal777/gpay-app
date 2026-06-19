@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Models\User;
+use App\Models\Wallet;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -74,31 +76,71 @@ class ChatController extends Controller
 
     // Send message
     public function sendMessage(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'receiver_id' => 'required|exists:users,id',
-            'message' => 'required_without:amount|string|nullable',
-            'amount' => 'required_without:message|numeric|min:1|nullable',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'receiver_id' => 'required|exists:users,id',
+        'message' => 'required_without:amount|string|nullable',
+        'amount' => 'required_without:message|numeric|min:1|nullable',
+    ]);
 
-        if ($validator->fails()) {
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => false,
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    $sender = $request->user();
+    $receiverId = $request->receiver_id;
+
+    // If amount is present, process payment FIRST
+    if ($request->amount && $request->amount > 0) {
+        $senderWallet = $sender->wallet;
+        $receiverWallet = \App\Models\Wallet::where('user_id', $receiverId)->first();
+
+        if (!$senderWallet || !$receiverWallet) {
             return response()->json([
                 'status' => false,
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'Wallet not found'
+            ], 400);
         }
 
-        $message = Message::create([
-            'sender_id' => $request->user()->id,
-            'receiver_id' => $request->receiver_id,
-            'message' => $request->message,
-            'amount' => $request->amount,
-            'type' => $request->amount ? 'payment' : 'text',
-        ]);
+        if (!$senderWallet->hasSufficientBalance($request->amount)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Insufficient balance'
+            ], 400);
+        }
 
-        return response()->json([
-            'status' => true,
-            'message' => $message->load(['sender', 'receiver'])
-        ], 201);
+        // Transfer money
+        $senderWallet->debit($request->amount);
+        $receiverWallet->credit($request->amount);
+
+        // Create transaction record
+        $transactionId = Transaction::generateTransactionId();
+        Transaction::create([
+            'transaction_id' => $transactionId,
+            'sender_id' => $sender->id,
+            'receiver_id' => $receiverId,
+            'amount' => $request->amount,
+            'type' => 'debit',
+            'status' => 'completed',
+            'note' => $request->message,
+        ]);
     }
+
+    // Create chat message
+    $message = Message::create([
+        'sender_id' => $sender->id,
+        'receiver_id' => $receiverId,
+        'message' => $request->message,
+        'amount' => $request->amount,
+        'type' => $request->amount ? 'payment' : 'text',
+    ]);
+
+    return response()->json([
+        'status' => true,
+        'message' => $message->load(['sender', 'receiver'])
+    ], 201);
+}
 }
