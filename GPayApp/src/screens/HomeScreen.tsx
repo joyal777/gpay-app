@@ -96,11 +96,11 @@ const loadChatUsers = async () => {
           {/* Search Bar with Dropdown */}
           <View style={styles.searchWrapper}>
             <View style={styles.searchContainer}>
-              <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
+              <Ionicons name="search" size={20} color="#6e6c6c" style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
                 placeholder="Search by UPI ID or phone number"
-                placeholderTextColor="#999"
+                placeholderTextColor="#f4f4f4"
                 value={searchQuery}
                 onChangeText={searchUsers}
                 onFocus={() => {
@@ -308,10 +308,10 @@ const loadChatUsers = async () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a73e8',
+    backgroundColor: '#32bc82',
   },
   topSection: {
-    backgroundColor: '#1a73e8',
+    backgroundColor: '#32bc82',
     paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 30,
