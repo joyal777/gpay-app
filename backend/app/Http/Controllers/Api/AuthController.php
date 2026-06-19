@@ -99,6 +99,56 @@ class AuthController extends Controller
             'user' => $user->load('wallet')
         ], 200);
     }
+    public function setUpiPin(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'upi_pin' => 'required|digits:4|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user = $request->user();
+        $user->upi_pin = Hash::make($request->upi_pin);
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'UPI PIN set successfully'
+        ]);
+    }
+
+    public function verifyUpiPin(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'upi_pin' => 'required|digits:4|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user = $request->user();
+
+        if (!$user->upi_pin || !Hash::check($request->upi_pin, $user->upi_pin)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid UPI PIN'
+            ], 401);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'PIN verified'
+        ]);
+    }
 
     public function profile(Request $request)
     {

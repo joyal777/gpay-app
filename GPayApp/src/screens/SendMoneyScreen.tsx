@@ -44,6 +44,19 @@ export default function SendMoneyScreen({ navigation }: any) {
     }
   };
 
+  const handleSendMoneyWithPin = () => {
+    if (!selectedUser || !amount) {
+      Alert.alert('Error', 'Please select user and enter amount');
+      return;
+    }
+    
+    // Navigate to PIN screen
+    navigation.navigate('Pin', {
+      amount: amount,
+      receiverName: selectedUser.name,
+      onSuccess: handleSendMoney,
+    });
+  };
   const handleSendMoney = async () => {
     if (!selectedUser || !amount) {
       Alert.alert('Error', 'Please select user and enter amount');
@@ -200,7 +213,7 @@ export default function SendMoneyScreen({ navigation }: any) {
           {/* Send Button */}
           <TouchableOpacity 
             style={[styles.sendButton, (!amount || sending) && styles.sendButtonDisabled]}
-            onPress={handleSendMoney}
+            onPress={handleSendMoneyWithPin}
             disabled={!amount || sending}
           >
             {sending ? (

@@ -27,6 +27,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
 
     // Auth Routes
+    Route::post('/profile/upi-pin', [AuthController::class, 'setUpiPin']);
+    Route::post('/profile/verify-pin', [AuthController::class, 'verifyUpiPin']);
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
     Route::post('/profile/pic', [AuthController::class, 'updateProfilePic']);
@@ -40,8 +42,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chat/send', [ChatController::class, 'sendMessage']);
     // Wallet Routes
     Route::get('/wallet/balance', [WalletController::class, 'balance']);
-    Route::post('/wallet/add-money', [WalletController::class, 'addMoney']);
-    Route::post('/wallet/send-money', [WalletController::class, 'sendMoney']);
     Route::get('/wallet/transactions', [WalletController::class, 'transactions']);
 
     // Beneficiary Routes
@@ -49,3 +49,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/beneficiaries', [BeneficiaryController::class, 'store']);
     Route::delete('/beneficiaries/{id}', [BeneficiaryController::class, 'destroy']);
 });
+
+// Routes that ALWAYS need PIN
+Route::middleware(['auth:sanctum', 'upi.pin'])->group(function () {
+    Route::post('/wallet/send-money', [WalletController::class, 'sendMoney']);
+    Route::post('/wallet/add-money', [WalletController::class, 'addMoney']);
+});
+
+// Chat route - PIN checked inside controller only if payment

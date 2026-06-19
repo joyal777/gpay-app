@@ -9,6 +9,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -55,22 +56,37 @@ export default function ChatScreen({ navigation, route }: any) {
   };
 
   const sendPayment = async () => {
-    if (!amount) return;
+  if (!amount) return;
 
-    try {
-      await api.post('/chat/send', {
-        receiver_id: chatUser.id,
-        amount: parseFloat(amount),
-        message: inputMessage.trim() || null,
-      });
-      setAmount('');
-      setInputMessage('');
-      setShowPayment(false);
-      loadMessages();
-    } catch (error) {
-      console.error('Error sending payment:', error);
-    }
-  };
+  // Show PIN screen first
+  navigation.navigate('Pin', {
+    amount: amount,
+    receiverName: chatUser.name,
+    onSuccess: (pin: string) => {
+      // Send payment with PIN
+      processPayment(pin);
+    },
+  });
+};
+
+const processPayment = async (pin: string) => {
+  try {
+    await api.post('/chat/send', {
+      receiver_id: chatUser.id,
+      amount: parseFloat(amount),
+      message: inputMessage.trim() || null,
+      upi_pin: pin,
+    });
+    
+    setAmount('');
+    setInputMessage('');
+    setShowPayment(false);
+    loadMessages();
+    Alert.alert('Success', 'Payment sent!');
+  } catch (error: any) {
+    Alert.alert('Error', error.response?.data?.message || 'Payment failed');
+  }
+};
 
   const renderMessage = ({ item }: any) => {
     const isMine = item.sender_id === user?.id;

@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         //
+        $middleware->alias([
+            'upi.pin' => \App\Http\Middleware\VerifyUpiPin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

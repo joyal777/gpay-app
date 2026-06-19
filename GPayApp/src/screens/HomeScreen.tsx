@@ -182,10 +182,10 @@ const loadChatUsers = async () => {
         {/* WHITE SECTION */}
         <View style={styles.whiteSection}>
           {/* Balance Card */}
-          <View style={styles.balanceCard}>
+          {/* <View style={styles.balanceCard}>
             <Text style={styles.balanceLabel}>Available Balance</Text>
             <Text style={styles.balanceAmount}>₹{user?.wallet?.balance || '0.00'}</Text>
-          </View>
+          </View> */}
             {/* People - Chat Users */}
         <View style={styles.peopleSection}>
             <Text style={styles.sectionTitle}>People</Text>
@@ -260,29 +260,37 @@ const loadChatUsers = async () => {
             {recentTransactions.length > 0 ? (
               recentTransactions.map((tx: any) => (
                 <View key={tx.id} style={styles.transactionItem}>
-                  <View style={[styles.txIcon, {
-                    backgroundColor: tx.sender_id === user?.id ? '#fce4ec' : '#e8f5e9'
-                  }]}>
-                    <Ionicons 
-                      name={tx.sender_id === user?.id ? "arrow-up" : "arrow-down"} 
-                      size={20} 
-                      color={tx.sender_id === user?.id ? "#c62828" : "#2e7d32"} 
-                    />
-                  </View>
-                  <View style={styles.txInfo}>
-                    <Text style={styles.txName}>
-                      {tx.sender_id === user?.id ? tx.receiver?.name : tx.sender?.name}
-                    </Text>
-                    <Text style={styles.txDate}>
-                      {new Date(tx.created_at).toLocaleDateString()}
-                    </Text>
-                  </View>
-                  <Text style={[styles.txAmount, {
-                    color: tx.sender_id === user?.id ? '#c62828' : '#2e7d32'
-                  }]}>
-                    {tx.sender_id === user?.id ? '-' : '+'}₹{tx.amount}
-                  </Text>
-                </View>
+  {/* Profile Pic of other person */}
+  <View style={styles.txProfilePic}>
+    <Text style={styles.txProfilePicText}>
+      {tx.sender_id === user?.id 
+        ? tx.receiver?.name?.charAt(0) 
+        : tx.sender?.name?.charAt(0)}
+    </Text>
+  </View>
+  
+  <View style={styles.txInfo}>
+    <Text style={styles.txName}>
+      {tx.sender_id === user?.id 
+        ? `You paid ${tx.receiver?.name || 'Unknown'}` 
+        : `${tx.sender?.name || 'Unknown'} paid you`}
+    </Text>
+    <Text style={styles.txDate}>
+      {new Date(tx.created_at).toLocaleDateString()} • {new Date(tx.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
+    </Text>
+  </View>
+  
+  {/* Debit/Credit indicator only, no amount */}
+  <View style={[styles.txIndicator, {
+    backgroundColor: tx.sender_id === user?.id ? '#fce4ec' : '#e8f5e9'
+  }]}>
+    <Ionicons 
+      name={tx.sender_id === user?.id ? "arrow-up" : "arrow-down"} 
+      size={16} 
+      color={tx.sender_id === user?.id ? "#c62828" : "#2e7d32"} 
+    />
+  </View>
+</View>
               ))
             ) : (
               <View style={styles.emptyState}>
@@ -458,6 +466,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
   },
+  txProfilePic: {
+  width: 40,
+  height: 40,
+  borderRadius: 20,
+  backgroundColor: '#e8f0fe',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginRight: 12,
+},
+txProfilePicText: {
+  color: '#1a73e8',
+  fontSize: 16,
+  fontWeight: 'bold',
+},
+txIndicator: {
+  width: 32,
+  height: 32,
+  borderRadius: 16,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
   txInfo: {
     flex: 1,
   },

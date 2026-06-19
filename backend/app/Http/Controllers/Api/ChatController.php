@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class ChatController extends Controller
@@ -81,6 +82,7 @@ class ChatController extends Controller
         'receiver_id' => 'required|exists:users,id',
         'message' => 'required_without:amount|string|nullable',
         'amount' => 'required_without:message|numeric|min:1|nullable',
+        'upi_pin' => 'required_if:amount,>0|digits:4|numeric',
     ]);
 
     if ($validator->fails()) {
@@ -93,10 +95,32 @@ class ChatController extends Controller
     $sender = $request->user();
     $receiverId = $request->receiver_id;
 
-    // If amount is present, process payment FIRST
+    // If amount is present, verify PIN and process payment
     if ($request->amount && $request->amount > 0) {
+
+        // Check if user has UPI PIN set
+        if (!$sender->upi_pin) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Please set your UPI PIN first',
+                'code' => 'PIN_NOT_SET'
+            ], 403);
+        }
+
+        // Verify UPI PIN
+        $pin = $request->header('X-UPI-PIN') ?? $request->upi_pin;
+
+        if (!$pin || !Hash::check($pin, $sender->upi_pin)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid UPI PIN',
+                'code' => 'INVALID_PIN'
+            ], 403);
+        }
+
+        // Process payment
         $senderWallet = $sender->wallet;
-        $receiverWallet = \App\Models\Wallet::where('user_id', $receiverId)->first();
+        $receiverWallet = Wallet::where('user_id', $receiverId)->first();
 
         if (!$senderWallet || !$receiverWallet) {
             return response()->json([
@@ -129,7 +153,7 @@ class ChatController extends Controller
         ]);
     }
 
-    // Create chat message
+    // Create chat message (works for both text and payment)
     $message = Message::create([
         'sender_id' => $sender->id,
         'receiver_id' => $receiverId,
