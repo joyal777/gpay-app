@@ -159,6 +159,7 @@ class ChatController extends Controller
         'receiver_id' => $receiverId,
         'message' => $request->message,
         'amount' => $request->amount,
+        'transaction_id' => $transactionId ?? null,
         'type' => $request->amount ? 'payment' : 'text',
     ]);
 

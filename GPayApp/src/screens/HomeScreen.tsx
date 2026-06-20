@@ -271,7 +271,12 @@ const loadChatUsers = async () => {
                 style={styles.transactionItem}
                 onPress={() => {
                   const chatUser = tx.sender_id === user?.id ? tx.receiver : tx.sender;
-                  navigation.navigate('Chat', { chatUser: chatUser });
+                  console.log('Navigating to chat with:', chatUser.name);
+                  console.log('Highlight transaction:', tx.transaction_id);
+                  navigation.navigate('Chat', { 
+                    chatUser: chatUser,
+                    highlightTransactionId: tx.transaction_id
+                  });
                 }}
               >
                 {/* Profile Pic of other person */}

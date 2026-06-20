@@ -127,6 +127,7 @@ class WalletController extends Controller
             'receiver_id' => $receiverWallet->user_id,
             'amount' => $request->amount,
             'message' => $request->note ?? '💸 Payment sent',
+            'transaction_id' => $transactionId,
             'type' => 'payment',
             'status' => 'completed',
         ]);

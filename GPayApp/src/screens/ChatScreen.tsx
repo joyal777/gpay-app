@@ -20,16 +20,55 @@ import { IMAGE_BASE } from '../services/config';
 
 export default function ChatScreen({ navigation, route }: any) {
   const { user } = useAuth();
-  const { chatUser } = route.params;
+  const { chatUser, highlightTransactionId } = route.params;
   const [messages, setMessages] = useState([]);
+  const [highlightedMsgId, setHighlightedMsgId] = useState<number | null>(null);
   const [inputMessage, setInputMessage] = useState('');
   const [showPayment, setShowPayment] = useState(false);
   const [amount, setAmount] = useState('');
-  const flatListRef = useRef(null);
+  const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
     loadMessages();
   }, []);
+
+  useEffect(() => {
+  console.log('=== HIGHLIGHT DEBUG ===');
+  console.log('highlightTransactionId:', highlightTransactionId);
+  console.log('messages count:', messages.length);
+  
+  if (highlightTransactionId && messages.length > 0) {
+    // Check if any message has transaction_id
+    const sample = messages[0];
+    console.log('Sample message:', JSON.stringify(sample));
+    
+    const highlightedMsg = messages.find(
+      (m: any) => m.transaction_id === highlightTransactionId
+    );
+    
+    console.log('Found highlightedMsg:', highlightedMsg ? 'YES' : 'NO');
+
+    if (highlightedMsg) {
+      setHighlightedMsgId(highlightedMsg.id);
+      
+      const index = messages.findIndex((m: any) => m.id === highlightedMsg.id);
+      console.log('Index of highlighted:', index);
+      
+      if (index >= 0) {
+        setTimeout(() => {
+          console.log('Scrolling to index:', index);
+          flatListRef.current?.scrollToIndex({
+            index,
+            animated: true,
+            viewPosition: 0.5,
+          });
+        }, 800);
+      }
+      
+      setTimeout(() => setHighlightedMsgId(null), 3000);
+    }
+  }
+}, [messages.length, highlightTransactionId]);
 
   const loadMessages = async () => {
     try {
@@ -90,10 +129,12 @@ const processPayment = async (pin: string) => {
 
   const renderMessage = ({ item }: any) => {
     const isMine = item.sender_id === user?.id;
+    const isHighlighted = item.id === highlightedMsgId;
 
     if (item.type === 'payment') {
   return (
-    <View style={[styles.paymentBubble, isMine ? styles.myPayment : styles.theirPayment]}>
+    <View style={[styles.paymentBubble, isMine ? styles.myPayment : styles.theirPayment,
+        isHighlighted && styles.highlightedBubble]}>
       <View style={styles.paymentHeader}>
         <Text style={styles.paymentEmoji}>💸</Text>
         <Text style={styles.paymentLabel}>
@@ -115,13 +156,17 @@ const processPayment = async (pin: string) => {
 }
 
     return (
-      <View style={[styles.messageBubble, isMine ? styles.myMessage : styles.theirMessage]}>
-        <Text style={[styles.messageText, isMine && styles.myMessageText]}>
-          {item.message}
-        </Text>
-      </View>
-    );
-  };
+    <View style={[
+      styles.messageBubble,
+      isMine ? styles.myMessage : styles.theirMessage,
+      isHighlighted && styles.highlightedBubble
+    ]}>
+      <Text style={[styles.messageText, isMine && styles.myMessageText]}>
+        {item.message}
+      </Text>
+    </View>
+  );
+};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -143,6 +188,7 @@ const processPayment = async (pin: string) => {
             <Text style={styles.headerUpi}>{chatUser.upi_id}</Text>
           </View>
         </View>
+        
         <TouchableOpacity onPress={() => setShowPayment(!showPayment)}>
           <Ionicons name="cash-outline" size={24} color={showPayment ? '#1a73e8' : '#666'} />
         </TouchableOpacity>
@@ -153,9 +199,23 @@ const processPayment = async (pin: string) => {
         ref={flatListRef}
         data={messages}
         renderItem={renderMessage}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item: any) => item.id.toString()}
         style={styles.messageList}
-        onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
+        onContentSizeChange={() => {
+          if (!highlightTransactionId) {
+            flatListRef.current?.scrollToEnd({ animated: false });
+          }
+        }}
+        onScrollToIndexFailed={(info) => {
+          // Wait and try again
+          setTimeout(() => {
+            flatListRef.current?.scrollToIndex({ 
+              index: info.index, 
+              animated: true,
+              viewPosition: 0.5 
+            });
+          }, 500);
+        }}
         ListEmptyComponent={
           <View style={styles.emptyChat}>
             <Ionicons name="chatbubbles-outline" size={64} color="#ccc" />
@@ -315,4 +375,14 @@ paymentNote: {
     borderTopWidth: 1, borderTopColor: '#eee', gap: 10,
   },
   textInput: { flex: 1, fontSize: 15, maxHeight: 80, paddingVertical: 8, paddingHorizontal: 12, backgroundColor: '#f5f5f5', borderRadius: 20 },
+  highlightedBubble: {
+  borderWidth: 2,
+  borderColor: '#FFD700',
+  shadowColor: '#FFD700',
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 0.5,
+  shadowRadius: 10,
+  elevation: 5,
+  transform: [{ scale: 1.02 }],
+},
 });

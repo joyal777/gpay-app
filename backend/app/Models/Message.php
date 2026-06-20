@@ -14,6 +14,7 @@ class Message extends Model
         'receiver_id',
         'message',
         'amount',
+        'transaction_id',
         'type',
         'status',
     ];
