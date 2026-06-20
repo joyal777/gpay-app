@@ -33,17 +33,24 @@ export default function HomeScreen({ navigation }: any) {
   }, [])
 );
 
-  const loadTransactions = async () => {
-    try {
-      const response = await api.get('/wallet/transactions');
-      if (response.data && response.data.data) {
-        setRecentTransactions(response.data.data.slice(0, 5));
+const loadTransactions = async () => {
+  try {
+    const response = await api.get('/wallet/transactions');
+    // Try both possible response formats
+    const transactions = response.data?.data?.data || 
+                         response.data?.data || 
+                         response.data?.transactions || 
+                         [];
+    
+        if (Array.isArray(transactions)) {
+          setRecentTransactions(transactions.slice(0, 5));
+        } else {
+          setRecentTransactions([]);
+        }
+      } catch (error) {
+        setRecentTransactions([]);
       }
-    } catch (error) {
-      // Silent fail - no transactions yet
-      setRecentTransactions([]);
-    }
-};
+    };
 
 const searchUsers = async (query: string) => {
   setSearchQuery(query);
@@ -259,38 +266,45 @@ const loadChatUsers = async () => {
 
             {recentTransactions.length > 0 ? (
               recentTransactions.map((tx: any) => (
-                <View key={tx.id} style={styles.transactionItem}>
-  {/* Profile Pic of other person */}
-  <View style={styles.txProfilePic}>
-    <Text style={styles.txProfilePicText}>
-      {tx.sender_id === user?.id 
-        ? tx.receiver?.name?.charAt(0) 
-        : tx.sender?.name?.charAt(0)}
-    </Text>
-  </View>
+              <TouchableOpacity 
+                key={tx.id} 
+                style={styles.transactionItem}
+                onPress={() => {
+                  const chatUser = tx.sender_id === user?.id ? tx.receiver : tx.sender;
+                  navigation.navigate('Chat', { chatUser: chatUser });
+                }}
+              >
+                {/* Profile Pic of other person */}
+                <View style={styles.txProfilePic}>
+                  <Text style={styles.txProfilePicText}>
+                    {tx.sender_id === user?.id 
+                      ? tx.receiver?.name?.charAt(0) 
+                      : tx.sender?.name?.charAt(0)}
+                  </Text>
+                </View>
+                
+                <View style={styles.txInfo}>
+                  <Text style={styles.txName}>
+                    {tx.sender_id === user?.id 
+                      ? `You paid ${tx.receiver?.name || 'Unknown'}` 
+                      : `${tx.sender?.name || 'Unknown'} paid you`}
+                  </Text>
+                  <Text style={styles.txDate}>
+                    {new Date(tx.created_at).toLocaleDateString()} • {new Date(tx.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
+                  </Text>
+                </View>
   
-  <View style={styles.txInfo}>
-    <Text style={styles.txName}>
-      {tx.sender_id === user?.id 
-        ? `You paid ${tx.receiver?.name || 'Unknown'}` 
-        : `${tx.sender?.name || 'Unknown'} paid you`}
-    </Text>
-    <Text style={styles.txDate}>
-      {new Date(tx.created_at).toLocaleDateString()} • {new Date(tx.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
-    </Text>
-  </View>
-  
-  {/* Debit/Credit indicator only, no amount */}
-  <View style={[styles.txIndicator, {
-    backgroundColor: tx.sender_id === user?.id ? '#fce4ec' : '#e8f5e9'
-  }]}>
-    <Ionicons 
-      name={tx.sender_id === user?.id ? "arrow-up" : "arrow-down"} 
-      size={16} 
-      color={tx.sender_id === user?.id ? "#c62828" : "#2e7d32"} 
-    />
-  </View>
-</View>
+                {/* Debit/Credit indicator only, no amount */}
+                <View style={[styles.txIndicator, {
+                  backgroundColor: tx.sender_id === user?.id ? '#fce4ec' : '#e8f5e9'
+                }]}>
+                  <Ionicons 
+                    name={tx.sender_id === user?.id ? "arrow-up" : "arrow-down"} 
+                    size={16} 
+                    color={tx.sender_id === user?.id ? "#c62828" : "#2e7d32"} 
+                  />
+                  </View>
+              </TouchableOpacity>
               ))
             ) : (
               <View style={styles.emptyState}>
