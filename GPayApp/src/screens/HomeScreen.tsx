@@ -259,7 +259,7 @@ const loadChatUsers = async () => {
           <View style={styles.transactionsSection}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Recent Activity</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.navigate('Transactions')}>
                 <Text style={styles.viewAll}>View All</Text>
               </TouchableOpacity>
             </View>

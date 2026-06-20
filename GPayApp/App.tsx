@@ -13,7 +13,9 @@ import ChatScreen from './src/screens/ChatScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
 import SetPinScreen from './src/screens/SetPinScreen';
 import PinScreen from './src/screens/PinScreen';
+import TransactionsScreen from './src/screens/TransactionsScreen';
 
+// In logged-in Stack:
 
 
 const Stack = createNativeStackNavigator();
@@ -42,6 +44,8 @@ function AppNavigator() {
           <Stack.Screen name="Pin" component={PinScreen} />
           <Stack.Screen name="Chat" component={ChatScreen} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+          <Stack.Screen name="Transactions" component={TransactionsScreen} />
+
         </>
       ) : (
         // Not Logged In - Show Login & Register
