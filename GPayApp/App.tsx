@@ -14,6 +14,7 @@ import EditProfileScreen from './src/screens/EditProfileScreen';
 import SetPinScreen from './src/screens/SetPinScreen';
 import PinScreen from './src/screens/PinScreen';
 import TransactionsScreen from './src/screens/TransactionsScreen';
+import ScanScreen from './src/screens/ScanScreen';
 
 // In logged-in Stack:
 
@@ -45,6 +46,7 @@ function AppNavigator() {
           <Stack.Screen name="Chat" component={ChatScreen} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           <Stack.Screen name="Transactions" component={TransactionsScreen} />
+          <Stack.Screen name="Scan" component={ScanScreen} />
 
         </>
       ) : (

@@ -233,7 +233,10 @@ const loadChatUsers = async () => {
                 <Text style={styles.actionText}>Send</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => navigation.navigate('Scan')}
+            >
               <View style={[styles.actionIcon, { backgroundColor: '#e3f2fd' }]}>
                 <Ionicons name="qr-code" size={24} color="#1565c0" />
               </View>
