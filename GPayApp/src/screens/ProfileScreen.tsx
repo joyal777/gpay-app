@@ -142,7 +142,7 @@ export default function ProfileScreen({ navigation }: any) {
             onPress={() => navigation.navigate('AddBankAccount')}
           >
             <Ionicons name="business-outline" size={24} color="#333" />
-            <Text style={styles.menuText}>Bank Account</Text>
+            <Text style={styles.menuText}>Bank Accounts</Text>
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
 

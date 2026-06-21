@@ -51,8 +51,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/beneficiaries/{id}', [BeneficiaryController::class, 'destroy']);
 
     // Bank Routes
-Route::post('/bank/account', [BankController::class, 'saveAccount']);
+// Bank Routes
+Route::get('/bank/accounts', [BankController::class, 'getAccounts']);
 Route::get('/bank/account', [BankController::class, 'getAccount']);
+Route::post('/bank/account', [BankController::class, 'saveAccount']);
+Route::post('/bank/account/{id}/default', [BankController::class, 'setDefault']);
+Route::delete('/bank/account/{id}', [BankController::class, 'deleteAccount']);
+Route::post('/bank/account/{id}/verify-pin', [BankController::class, 'verifyPin']);
+Route::post('/bank/account/{id}/pin', [BankController::class, 'updatePin']);
 Route::post('/bank/transfer', [BankController::class, 'transfer']);
 Route::get('/bank/history', [BankController::class, 'history']);
 });

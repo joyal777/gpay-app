@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput,
-  ScrollView, Alert, ActivityIndicator, FlatList,
+  ScrollView, Alert, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import AccountSelector from '../components/AccountSelector';
+
 
 export default function BankTransferScreen({ navigation }: any) {
   const { user } = useAuth();
@@ -18,17 +20,25 @@ export default function BankTransferScreen({ navigation }: any) {
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
-  const [savedAccount, setSavedAccount] = useState<any>(null);
+  
+  // Multiple accounts
+  const [savedAccounts, setSavedAccounts] = useState<any[]>([]);
+  const [selectedAccount, setSelectedAccount] = useState<any>(null);
+  const [showAccountSelector, setShowAccountSelector] = useState(false);
 
   useEffect(() => {
-    loadSavedAccount();
+    loadSavedAccounts();
     loadHistory();
   }, []);
 
-  const loadSavedAccount = async () => {
+  const loadSavedAccounts = async () => {
     try {
-      const res = await api.get('/bank/account');
-      if (res.data.account) setSavedAccount(res.data.account);
+      const res = await api.get('/bank/accounts');
+      const accounts = res.data.accounts || [];
+      setSavedAccounts(accounts);
+      const defaultAcc = accounts.find((a: any) => a.is_default);
+      if (defaultAcc) setSelectedAccount(defaultAcc);
+      else if (accounts.length > 0) setSelectedAccount(accounts[0]);
     } catch (error) {}
   };
 
@@ -40,17 +50,21 @@ export default function BankTransferScreen({ navigation }: any) {
   };
 
   const handleSelfTransfer = () => {
-    if (!savedAccount) {
+    if (!selectedAccount) {
       Alert.alert('No Account', 'Please add your bank account first');
       return;
     }
-    setAccountNumber(savedAccount.account_number);
-    setIfscCode(savedAccount.ifsc_code);
-    setReceiverName(savedAccount.account_holder);
+    setAccountNumber(selectedAccount.account_number);
+    setIfscCode(selectedAccount.ifsc_code);
+    setReceiverName(selectedAccount.account_holder);
     setActiveTab('self');
   };
 
   const handleTransfer = async () => {
+    if (!selectedAccount) {
+      Alert.alert('Error', 'Please select a bank account');
+      return;
+    }
     if (!accountNumber || !ifscCode || !receiverName || !amount) {
       Alert.alert('Error', 'Please fill all fields');
       return;
@@ -63,13 +77,13 @@ export default function BankTransferScreen({ navigation }: any) {
         setLoading(true);
         try {
           await api.post('/bank/transfer', {
-            account_number: accountNumber,
-            ifsc_code: ifscCode,
+            account_id: selectedAccount.id,
+            to_account_number: accountNumber,
+            to_ifsc_code: ifscCode,
             receiver_name: receiverName,
             amount: parseFloat(amount),
             note: note || undefined,
-            upi_pin: pin,
-            is_self_transfer: activeTab === 'self',
+            account_pin: pin,
           });
 
           Alert.alert('Success', 'Bank transfer successful!', [
@@ -99,6 +113,40 @@ export default function BankTransferScreen({ navigation }: any) {
       </View>
 
       <ScrollView style={styles.content}>
+        {/* Account Selector */}
+        <AccountSelector
+          visible={showAccountSelector}
+          accounts={savedAccounts}
+          selectedId={selectedAccount?.id || null}
+          onSelect={(account) => {
+            setSelectedAccount(account);
+            setShowAccountSelector(false);
+          }}
+          onClose={() => setShowAccountSelector(false)}
+        />
+
+        {/* Selected Account */}
+        <TouchableOpacity 
+          style={styles.selectedAccount}
+          onPress={() => setShowAccountSelector(true)}
+        >
+          <Text style={styles.fromLabel}>From Account</Text>
+          <View style={styles.selectedAccountInfo}>
+            <View style={styles.bankIcon}>
+              <Ionicons name="business" size={20} color="#1a73e8" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.selectedBankName}>
+                {selectedAccount?.bank_name || 'Select Bank Account'}
+              </Text>
+              <Text style={styles.selectedAccNum}>
+                ****{selectedAccount?.account_number?.slice(-4) || '----'}
+              </Text>
+            </View>
+            <Ionicons name="chevron-down" size={20} color="#999" />
+          </View>
+        </TouchableOpacity>
+
         {/* Tabs */}
         <View style={styles.tabContainer}>
           <TouchableOpacity 
@@ -123,7 +171,7 @@ export default function BankTransferScreen({ navigation }: any) {
 
         {/* Form */}
         <View style={styles.form}>
-          <Text style={styles.label}>Account Number</Text>
+          <Text style={styles.label}>Receiver Account Number</Text>
           <TextInput
             style={styles.input}
             placeholder="Enter account number"
@@ -131,6 +179,7 @@ export default function BankTransferScreen({ navigation }: any) {
             onChangeText={setAccountNumber}
             keyboardType="numeric"
             maxLength={18}
+            editable={activeTab !== 'self'}
           />
 
           <Text style={styles.label}>IFSC Code</Text>
@@ -141,6 +190,7 @@ export default function BankTransferScreen({ navigation }: any) {
             onChangeText={setIfscCode}
             autoCapitalize="characters"
             maxLength={11}
+            editable={activeTab !== 'self'}
           />
 
           <Text style={styles.label}>Receiver Name</Text>
@@ -149,6 +199,7 @@ export default function BankTransferScreen({ navigation }: any) {
             placeholder="Enter account holder name"
             value={receiverName}
             onChangeText={setReceiverName}
+            editable={activeTab !== 'self'}
           />
 
           <Text style={styles.label}>Amount</Text>
@@ -220,23 +271,35 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontSize: 18, fontWeight: '600', color: '#333' },
   content: { flex: 1 },
+  selectedAccount: {
+    margin: 16, marginBottom: 0, padding: 14,
+    backgroundColor: '#f8f9fa', borderRadius: 12,
+    borderWidth: 1, borderColor: '#e0e0e0',
+  },
+  fromLabel: { fontSize: 11, color: '#999', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 },
+  selectedAccountInfo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  bankIcon: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: '#e8f0fe', justifyContent: 'center', alignItems: 'center',
+  },
+  selectedBankName: { fontSize: 14, fontWeight: '600', color: '#333' },
+  selectedAccNum: { fontSize: 12, color: '#666', marginTop: 1 },
   tabContainer: {
     flexDirection: 'row', margin: 16,
     backgroundColor: '#f5f5f5', borderRadius: 12, padding: 4,
   },
   tab: {
     flex: 1, flexDirection: 'row', justifyContent: 'center',
-    alignItems: 'center', paddingVertical: 12, borderRadius: 10,
-    gap: 8,
+    alignItems: 'center', paddingVertical: 12, borderRadius: 10, gap: 8,
   },
   activeTab: { backgroundColor: '#fff', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
   tabText: { fontSize: 14, color: '#666', fontWeight: '500' },
   activeTabText: { color: '#1a73e8' },
-  form: { padding: 16 },
+  form: { padding: 16, paddingTop: 8 },
   label: { fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 6, marginTop: 12 },
   input: {
     borderWidth: 1, borderColor: '#ddd', borderRadius: 12,
-    padding: 14, fontSize: 16, backgroundColor: '#f8f9fa',
+    padding: 14, fontSize: 16, backgroundColor: '#f8f9fa', color: '#333',
   },
   amountContainer: {
     flexDirection: 'row', alignItems: 'center',

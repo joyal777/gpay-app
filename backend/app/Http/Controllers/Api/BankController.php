@@ -6,11 +6,39 @@ use App\Http\Controllers\Controller;
 use App\Models\BankAccount;
 use App\Models\BankTransfer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class BankController extends Controller
 {
-    // Save bank account
+    // Get all accounts for user
+    public function getAccounts(Request $request)
+    {
+        $accounts = BankAccount::where('user_id', $request->user()->id)
+            ->where('is_active', true)
+            ->orderBy('is_default', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'accounts' => $accounts
+        ]);
+    }
+
+    // Get single account (for backward compatibility)
+    public function getAccount(Request $request)
+    {
+        $account = BankAccount::where('user_id', $request->user()->id)
+            ->where('is_default', true)
+            ->first();
+
+        return response()->json([
+            'status' => true,
+            'account' => $account
+        ]);
+    }
+
+    // Add new bank account
     public function saveAccount(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -18,6 +46,7 @@ class BankController extends Controller
             'ifsc_code' => 'required|string|size:11',
             'account_holder' => 'required|string',
             'bank_name' => 'nullable|string',
+            'account_pin' => 'required|digits:4',
         ]);
 
         if ($validator->fails()) {
@@ -27,61 +56,165 @@ class BankController extends Controller
             ], 422);
         }
 
-        $account = BankAccount::updateOrCreate(
-            ['user_id' => $request->user()->id],
-            [
-                'account_number' => $request->account_number,
-                'ifsc_code' => strtoupper($request->ifsc_code),
-                'account_holder' => $request->account_holder,
-                'bank_name' => $request->bank_name,
-            ]
-        );
+        // Check duplicate account
+        $exists = BankAccount::where('user_id', $request->user()->id)
+            ->where('account_number', $request->account_number)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'status' => false,
+                'message' => 'This account number already exists'
+            ], 422);
+        }
+
+        // First account = default
+        $count = BankAccount::where('user_id', $request->user()->id)->count();
+
+        $account = BankAccount::create([
+            'user_id' => $request->user()->id,
+            'account_number' => $request->account_number,
+            'ifsc_code' => strtoupper($request->ifsc_code),
+            'account_holder' => $request->account_holder,
+            'bank_name' => $request->bank_name,
+            'account_pin' => Hash::make($request->account_pin),
+            'is_default' => $count === 0,
+        ]);
 
         return response()->json([
             'status' => true,
-            'message' => 'Bank account saved',
-            'account' => $account
+            'message' => 'Bank account added successfully',
+            'account' => $this->formatAccount($account)
+        ], 201);
+    }
+    // Set/Update account PIN
+public function updatePin(Request $request, $id)
+{
+    $validator = Validator::make($request->all(), [
+        'account_pin' => 'required|digits:4',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => false,
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    $account = BankAccount::where('user_id', $request->user()->id)
+        ->where('id', $id)->first();
+
+    if (!$account) {
+        return response()->json(['status' => false, 'message' => 'Account not found'], 404);
+    }
+
+    $account->update([
+        'account_pin' => Hash::make($request->account_pin),
+    ]);
+
+    return response()->json([
+        'status' => true,
+        'message' => 'PIN updated successfully'
+    ]);
+}
+    // Set default account
+    public function setDefault(Request $request, $id)
+    {
+        $account = BankAccount::where('user_id', $request->user()->id)
+            ->where('id', $id)->first();
+
+        if (!$account) {
+            return response()->json(['status' => false, 'message' => 'Account not found'], 404);
+        }
+
+        BankAccount::where('user_id', $request->user()->id)
+            ->update(['is_default' => false]);
+
+        $account->update(['is_default' => true]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Default account updated'
         ]);
     }
 
-    // Get saved bank account
-    public function getAccount(Request $request)
+    // Delete account
+    public function deleteAccount(Request $request, $id)
     {
-        $account = BankAccount::where('user_id', $request->user()->id)->first();
+        $account = BankAccount::where('user_id', $request->user()->id)
+            ->where('id', $id)->first();
 
-        return response()->json([
-            'status' => true,
-            'account' => $account
+        if (!$account) {
+            return response()->json(['status' => false, 'message' => 'Account not found'], 404);
+        }
+
+        if ($account->is_default) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Set another account as default first before removing'
+            ], 400);
+        }
+
+        $account->delete();
+
+        return response()->json(['status' => true, 'message' => 'Account removed']);
+    }
+
+    // Verify account PIN
+    public function verifyPin(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'account_pin' => 'required|digits:4',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $account = BankAccount::where('user_id', $request->user()->id)
+            ->where('id', $id)->first();
+
+        if (!$account || !Hash::check($request->account_pin, $account->account_pin)) {
+            return response()->json(['status' => false, 'message' => 'Invalid PIN'], 403);
+        }
+
+        return response()->json(['status' => true, 'message' => 'PIN verified']);
     }
 
     // Bank transfer
     public function transfer(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'account_number' => 'required|string',
-            'ifsc_code' => 'required|string',
+            'account_id' => 'required|exists:bank_accounts,id',
+            'to_account_number' => 'required|string',
+            'to_ifsc_code' => 'required|string',
             'receiver_name' => 'required|string',
             'amount' => 'required|numeric|min:1|max:500000',
             'note' => 'nullable|string',
-            'is_self_transfer' => 'boolean',
+            'account_pin' => 'required|digits:4',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'errors' => $validator->errors()
-            ], 422);
+            return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $sender = $request->user();
-        $wallet = $sender->wallet;
+        $user = $request->user();
+        $fromAccount = BankAccount::where('user_id', $user->id)
+            ->where('id', $request->account_id)->first();
 
+        if (!$fromAccount) {
+            return response()->json(['status' => false, 'message' => 'Source account not found'], 404);
+        }
+
+        // Verify account PIN
+        if (!Hash::check($request->account_pin, $fromAccount->account_pin)) {
+            return response()->json(['status' => false, 'message' => 'Invalid account PIN'], 403);
+        }
+
+        // Check wallet balance
+        $wallet = $user->wallet;
         if (!$wallet->hasSufficientBalance($request->amount)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Insufficient balance'
-            ], 400);
+            return response()->json(['status' => false, 'message' => 'Insufficient balance'], 400);
         }
 
         // Debit wallet
@@ -90,13 +223,12 @@ class BankController extends Controller
         // Create transfer record
         $transfer = BankTransfer::create([
             'transfer_id' => BankTransfer::generateTransferId(),
-            'sender_id' => $sender->id,
-            'receiver_account_number' => $request->account_number,
-            'receiver_ifsc_code' => strtoupper($request->ifsc_code),
+            'sender_id' => $user->id,
+            'receiver_account_number' => $request->to_account_number,
+            'receiver_ifsc_code' => strtoupper($request->to_ifsc_code),
             'receiver_name' => $request->receiver_name,
             'amount' => $request->amount,
             'note' => $request->note,
-            'is_self_transfer' => $request->is_self_transfer ?? false,
         ]);
 
         return response()->json([
@@ -118,5 +250,19 @@ class BankController extends Controller
             'status' => true,
             'transfers' => $transfers
         ]);
+    }
+
+    // Hide pin from account response
+    private function formatAccount($account)
+    {
+        return [
+            'id' => $account->id,
+            'bank_name' => $account->bank_name,
+            'account_number' => $account->account_number,
+            'account_holder' => $account->account_holder,
+            'ifsc_code' => $account->ifsc_code,
+            'is_default' => $account->is_default,
+            'is_active' => $account->is_active,
+        ];
     }
 }

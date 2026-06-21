@@ -11,8 +11,11 @@ class BankAccount extends Model
 
     protected $fillable = [
         'user_id', 'account_number', 'ifsc_code',
-        'bank_name', 'account_holder', 'is_verified'
+        'bank_name', 'account_holder', 'is_verified',
+        'is_default', 'is_active', 'account_pin',
     ];
+
+    protected $hidden = ['account_pin'];
 
     public function user()
     {

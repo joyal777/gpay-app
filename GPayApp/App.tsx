@@ -17,6 +17,7 @@ import TransactionsScreen from './src/screens/TransactionsScreen';
 import ScanScreen from './src/screens/ScanScreen';
 import BankTransferScreen from './src/screens/BankTransferScreen';
 import AddBankAccountScreen from './src/screens/AddBankAccountScreen';
+
 // In logged-in Stack:
 
 
