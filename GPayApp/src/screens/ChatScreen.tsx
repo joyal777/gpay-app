@@ -193,7 +193,11 @@ const processPayment = async (pin: string) => {
           <Ionicons name="cash-outline" size={24} color={showPayment ? '#1a73e8' : '#666'} />
         </TouchableOpacity>
       </View>
-
+      <KeyboardAvoidingView 
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
       {/* Messages */}
       <FlatList
         ref={flatListRef}
@@ -201,6 +205,7 @@ const processPayment = async (pin: string) => {
         renderItem={renderMessage}
         keyExtractor={(item: any) => item.id.toString()}
         style={styles.messageList}
+        contentContainerStyle={{ padding: 15, paddingBottom: 5 }}
         onContentSizeChange={() => {
           if (!highlightTransactionId) {
             flatListRef.current?.scrollToEnd({ animated: false });
@@ -248,7 +253,7 @@ const processPayment = async (pin: string) => {
       )}
 
       {/* Input Bar */}
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      
         <View style={styles.inputBar}>
           <TextInput
             style={styles.textInput}
@@ -292,13 +297,14 @@ const styles = StyleSheet.create({
   headerPicText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   headerName: { fontSize: 16, fontWeight: '600', color: '#333' },
   headerUpi: { fontSize: 12, color: '#999' },
-  messageList: { flex: 1, padding: 15 },
+  messageList: { flex: 1 },
   messageBubble: { 
   maxWidth: '75%', 
   padding: 12, 
   borderRadius: 18, 
   marginBottom: 8,
 },
+flex: { flex: 1 },
 myMessage: { 
   alignSelf: 'flex-end', 
   backgroundColor: '#1a73e8',
@@ -371,10 +377,24 @@ paymentNote: {
   payButtonDisabled: { backgroundColor: '#93c5fd' },
   payButtonText: { color: '#fff', fontWeight: '600' },
   inputBar: {
-    flexDirection: 'row', alignItems: 'center', padding: 10,
-    borderTopWidth: 1, borderTopColor: '#eee', gap: 10,
-  },
-  textInput: { flex: 1, fontSize: 15, maxHeight: 80, paddingVertical: 8, paddingHorizontal: 12, backgroundColor: '#f5f5f5', borderRadius: 20 },
+  flexDirection: 'row',
+  alignItems: 'center',
+  padding: 10,
+  borderTopWidth: 1,
+  borderTopColor: '#eee',
+  gap: 10,
+  backgroundColor: '#fff',
+  paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+},
+textInput: {
+  flex: 1,
+  fontSize: 15,
+  maxHeight: 80,
+  paddingVertical: 8,
+  paddingHorizontal: 12,
+  backgroundColor: '#f5f5f5',
+  borderRadius: 20,
+},
   highlightedBubble: {
   borderWidth: 2,
   borderColor: '#FFD700',
