@@ -9,6 +9,7 @@ import {
   TextInput,
   Image,
   FlatList,
+  ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -97,7 +98,12 @@ const loadChatUsers = async () => {
         }
       >
         {/* TOP SECTION WITH BACKGROUND */}
-        <View style={styles.topSection}>
+        {/* TOP SECTION WITH BACKGROUND IMAGE */}
+        <ImageBackground 
+          source={{ uri: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500' }}
+          style={styles.topSection}
+          imageStyle={{ opacity: 0.3 }}
+        >
           {/* Search Bar */}
           {/* Search Bar */}
           {/* Search Bar with Dropdown */}
@@ -184,7 +190,7 @@ const loadChatUsers = async () => {
             </View>
             <Ionicons name="chevron-forward" size={24} color="#fff" />
           </TouchableOpacity>
-        </View>
+        </ImageBackground>
 
         {/* WHITE SECTION */}
         <View style={styles.whiteSection}>
@@ -197,8 +203,8 @@ const loadChatUsers = async () => {
         {/* Quick Actions */}
         <View style={styles.actionsRow}>
         <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('SendMoney')}>
-          <View style={[styles.actionIcon, { backgroundColor: '#E8F5E9' }]}>
-            <Ionicons name="send" size={26} color="#2E7D32" />
+          <View style={[styles.actionIcon, { backgroundColor: '#E3F2FD' }]}>
+            <Ionicons name="send" size={26} color="#1565C0" />
           </View>
           <Text style={styles.actionText}>Send Money</Text>
         </TouchableOpacity>
@@ -211,50 +217,21 @@ const loadChatUsers = async () => {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('BankTransfer')}>
-          <View style={[styles.actionIcon, { backgroundColor: '#FFF3E0' }]}>
-            <Ionicons name="business" size={26} color="#E65100" />
+          <View style={[styles.actionIcon, { backgroundColor: '#E3F2FD' }]}>
+            <Ionicons name="business" size={26} color="#1565C0" />
           </View>
           <Text style={styles.actionText}>Bank Transfer</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton}>
-          <View style={[styles.actionIcon, { backgroundColor: '#FCE4EC' }]}>
-            <Ionicons name="phone-portrait" size={26} color="#C62828" />
+          <View style={[styles.actionIcon, { backgroundColor: '#E3F2FD' }]}>
+            <Ionicons name="phone-portrait" size={26} color="#1565C0" />
           </View>
           <Text style={styles.actionText}>Mobile Recharge</Text>
         </TouchableOpacity>
         </View>
 
-        {/* Second Row */}
-        <View style={styles.actionsRow}>
-          <TouchableOpacity style={styles.actionButton}>
-            <View style={[styles.actionIcon, { backgroundColor: '#F3E5F5' }]}>
-              <Ionicons name="flash" size={26} color="#7B1FA2" />
-            </View>
-            <Text style={styles.actionText}>Electricity</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton}>
-            <View style={[styles.actionIcon, { backgroundColor: '#E0F2F1' }]}>
-              <Ionicons name="wifi" size={26} color="#00695C" />
-            </View>
-            <Text style={styles.actionText}>Broadband</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton}>
-            <View style={[styles.actionIcon, { backgroundColor: '#FFF9C4' }]}>
-              <Ionicons name="card" size={26} color="#F57F17" />
-            </View>
-            <Text style={styles.actionText}>Credit Card</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton}>
-            <View style={[styles.actionIcon, { backgroundColor: '#E8EAF6' }]}>
-              <Ionicons name="grid" size={26} color="#283593" />
-            </View>
-            <Text style={styles.actionText}>More</Text>
-          </TouchableOpacity>
-        </View>
+        
         {/* People - Chat Users */}
         <View style={styles.peopleSection}>
             <Text style={styles.sectionTitle}>People</Text>
@@ -284,6 +261,37 @@ const loadChatUsers = async () => {
             />
         </View>
         
+        {/* Second Row */}
+        <Text style={styles.sectionTitle}>Bills & Recharges</Text>
+        <View style={styles.actionsRow}>
+          <TouchableOpacity style={styles.actionButton}>
+            <View style={[styles.actionIcon, { backgroundColor: '#F3E5F5' }]}>
+              <Ionicons name="flash" size={26} color="#7B1FA2" />
+            </View>
+            <Text style={styles.actionText}>Electricity</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionButton}>
+            <View style={[styles.actionIcon, { backgroundColor: '#E0F2F1' }]}>
+              <Ionicons name="wifi" size={26} color="#00695C" />
+            </View>
+            <Text style={styles.actionText}>Broadband</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionButton}>
+            <View style={[styles.actionIcon, { backgroundColor: '#FFF9C4' }]}>
+              <Ionicons name="card" size={26} color="#F57F17" />
+            </View>
+            <Text style={styles.actionText}>Credit Card</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionButton}>
+            <View style={[styles.actionIcon, { backgroundColor: '#E8EAF6' }]}>
+              <Ionicons name="grid" size={26} color="#283593" />
+            </View>
+            <Text style={styles.actionText}>More</Text>
+          </TouchableOpacity>
+        </View>
           
 
           {/* Recent Transactions */}
@@ -358,10 +366,10 @@ const loadChatUsers = async () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#32bc82',
+    backgroundColor: '#3285bc',
   },
   topSection: {
-    backgroundColor: '#32bc82',
+    backgroundColor: '#3285bc',
     paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 30,
@@ -468,7 +476,7 @@ const styles = StyleSheet.create({
   actionIcon: {
     width: 56,
     height: 56,
-    borderRadius: 28,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
