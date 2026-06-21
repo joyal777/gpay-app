@@ -64,7 +64,7 @@ Route::get('/bank/history', [BankController::class, 'history']);
 });
 
 // Routes that ALWAYS need PIN
-Route::middleware(['auth:sanctum', 'upi.pin'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/wallet/send-money', [WalletController::class, 'sendMoney']);
     Route::post('/wallet/add-money', [WalletController::class, 'addMoney']);
 });

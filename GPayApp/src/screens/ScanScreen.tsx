@@ -81,35 +81,22 @@ export default function ScanScreen({ navigation }: any) {
     }
   };
 
-  const handleSendMoney = async () => {
-    if (!amount || parseFloat(amount) <= 0) {
-      Alert.alert('Error', 'Enter a valid amount');
-      return;
-    }
+  const handleSendMoney = () => {
+  if (!amount || parseFloat(amount) <= 0) {
+    Alert.alert('Error', 'Enter a valid amount');
+    return;
+  }
 
-    navigation.navigate('Pin', {
-      amount: amount,
-      receiverName: scannedName,
-      onSuccess: async (pin: string) => {
-        setLoading(true);
-        try {
-          await api.post('/wallet/send-money', {
-            upi_id: scannedUpiId,
-            amount: parseFloat(amount),
-            upi_pin: pin,
-          });
-          
-          Alert.alert('Success', `₹${amount} sent to ${scannedName}`, [
-            { text: 'OK', onPress: () => navigation.goBack() }
-          ]);
-        } catch (error: any) {
-          Alert.alert('Error', error.response?.data?.message || 'Payment failed');
-        } finally {
-          setLoading(false);
-        }
-      },
-    });
-  };
+  navigation.navigate('Payment', {
+    amount: amount,
+    receiverName: scannedName,
+    receiverUpi: scannedUpiId,
+    type: 'upi',
+    onComplete: () => {
+      navigation.goBack();
+    },
+  });
+};
 
   return (
     <SafeAreaView style={styles.container}>

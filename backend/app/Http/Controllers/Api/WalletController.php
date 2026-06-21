@@ -59,9 +59,9 @@ class WalletController extends Controller
     public function sendMoney(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'upi_id' => 'required|string',
             'amount' => 'required|numeric|min:1',
             'note' => 'nullable|string|max:255',
+            'account_id' => 'nullable|exists:bank_accounts,id',
         ]);
 
         if ($validator->fails()) {

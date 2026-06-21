@@ -94,38 +94,23 @@ export default function ChatScreen({ navigation, route }: any) {
     }
   };
 
-  const sendPayment = async () => {
+  const sendPayment = () => {
   if (!amount) return;
-
-  // Show PIN screen first
-  navigation.navigate('Pin', {
+  
+  navigation.navigate('Payment', {
     amount: amount,
     receiverName: chatUser.name,
-    onSuccess: (pin: string) => {
-      // Send payment with PIN
-      processPayment(pin);
+    receiverUpi: chatUser.upi_id,
+    type: 'upi',
+    onComplete: () => {
+      setAmount('');
+      setInputMessage('');
+      setShowPayment(false);
+      loadMessages();
     },
   });
 };
 
-const processPayment = async (pin: string) => {
-  try {
-    await api.post('/chat/send', {
-      receiver_id: chatUser.id,
-      amount: parseFloat(amount),
-      message: inputMessage.trim() || null,
-      upi_pin: pin,
-    });
-    
-    setAmount('');
-    setInputMessage('');
-    setShowPayment(false);
-    loadMessages();
-    Alert.alert('Success', 'Payment sent!');
-  } catch (error: any) {
-    Alert.alert('Error', error.response?.data?.message || 'Payment failed');
-  }
-};
 
   const renderMessage = ({ item }: any) => {
     const isMine = item.sender_id === user?.id;

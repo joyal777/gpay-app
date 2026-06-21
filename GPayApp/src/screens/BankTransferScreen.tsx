@@ -60,46 +60,29 @@ export default function BankTransferScreen({ navigation }: any) {
     setActiveTab('self');
   };
 
-  const handleTransfer = async () => {
-    if (!selectedAccount) {
-      Alert.alert('Error', 'Please select a bank account');
-      return;
-    }
-    if (!accountNumber || !ifscCode || !receiverName || !amount) {
-      Alert.alert('Error', 'Please fill all fields');
-      return;
-    }
+  const handleTransfer = () => {
+  if (!selectedAccount) {
+    Alert.alert('Error', 'Please select a bank account');
+    return;
+  }
+  if (!accountNumber || !ifscCode || !receiverName || !amount) {
+    Alert.alert('Error', 'Please fill all fields');
+    return;
+  }
 
-    navigation.navigate('Pin', {
-      amount: amount,
-      receiverName: receiverName,
-      onSuccess: async (pin: string) => {
-        setLoading(true);
-        try {
-          await api.post('/bank/transfer', {
-            account_id: selectedAccount.id,
-            to_account_number: accountNumber,
-            to_ifsc_code: ifscCode,
-            receiver_name: receiverName,
-            amount: parseFloat(amount),
-            note: note || undefined,
-            account_pin: pin,
-          });
-
-          Alert.alert('Success', 'Bank transfer successful!', [
-            { text: 'OK', onPress: () => {
-              setAmount(''); setNote('');
-              loadHistory();
-            }}
-          ]);
-        } catch (error: any) {
-          Alert.alert('Error', error.response?.data?.message || 'Transfer failed');
-        } finally {
-          setLoading(false);
-        }
-      },
-    });
-  };
+  navigation.navigate('Payment', {
+    amount: amount,
+    receiverName: receiverName,
+    receiverAccount: accountNumber,
+    receiverIfsc: ifscCode,
+    type: 'bank',
+    note: note || undefined,
+    onComplete: () => {
+      setAmount(''); setNote('');
+      loadHistory();
+    },
+  });
+};
 
   return (
     <SafeAreaView style={styles.container}>

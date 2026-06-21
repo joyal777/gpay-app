@@ -57,44 +57,28 @@ export default function SendMoneyScreen({ navigation }: any) {
       onSuccess: handleSendMoney,
     });
   };
-  const handleSendMoney = async () => {
-    if (!selectedUser || !amount) {
-      Alert.alert('Error', 'Please select user and enter amount');
-      return;
-    }
-
-    setSending(true);
-    try {
-      const response = await api.post('/wallet/send-money', {
-        upi_id: selectedUser.upi_id,
-        amount: parseFloat(amount),
-        note: note || undefined,
-      });
-
-    Alert.alert('Success', `Sent ₹${amount} to ${selectedUser.name}`, [
-    { text: 'Done', onPress: () => {
-        setSelectedUser(null);
-        setAmount('');
-        setNote('');
-        setSearchQuery('');
-        setUsers([]);
-        refreshProfile();
-    }},
-    { text: 'Send Message', onPress: () => {
-        setSelectedUser(null);
-        setAmount('');
-        setNote('');
-        setSearchQuery('');
-        setUsers([]);
-        navigation.navigate('Chat', { chatUser: selectedUser });
-    }},
-    ]);
-    } catch (error: any) {
-      Alert.alert('Error', error.response?.data?.message || 'Payment failed');
-    } finally {
-      setSending(false);
-    }
-  };
+  const handleSendMoney = () => {
+  if (!selectedUser || !amount) {
+    Alert.alert('Error', 'Please select user and enter amount');
+    return;
+  }
+  
+  navigation.navigate('Payment', {
+    amount: amount,
+    receiverName: selectedUser.name,
+    receiverUpi: selectedUser.upi_id,
+    type: 'upi',
+    note: note || undefined,
+    onComplete: () => {
+      setSelectedUser(null);
+      setAmount('');
+      setNote('');
+      setSearchQuery('');
+      setUsers([]);
+      refreshProfile?.();
+    },
+  });
+};
 
   const renderUser = ({ item }: any) => (
     <TouchableOpacity 
@@ -213,7 +197,7 @@ export default function SendMoneyScreen({ navigation }: any) {
           {/* Send Button */}
           <TouchableOpacity 
             style={[styles.sendButton, (!amount || sending) && styles.sendButtonDisabled]}
-            onPress={handleSendMoneyWithPin}
+            onPress={handleSendMoney}
             disabled={!amount || sending}
           >
             {sending ? (

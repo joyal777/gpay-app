@@ -82,7 +82,7 @@ class ChatController extends Controller
         'receiver_id' => 'required|exists:users,id',
         'message' => 'required_without:amount|string|nullable',
         'amount' => 'required_without:message|numeric|min:1|nullable',
-        'upi_pin' => 'required_if:amount,>0|digits:4|numeric',
+
     ]);
 
     if ($validator->fails()) {
@@ -99,24 +99,9 @@ class ChatController extends Controller
     if ($request->amount && $request->amount > 0) {
 
         // Check if user has UPI PIN set
-        if (!$sender->upi_pin) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Please set your UPI PIN first',
-                'code' => 'PIN_NOT_SET'
-            ], 403);
-        }
+
 
         // Verify UPI PIN
-        $pin = $request->header('X-UPI-PIN') ?? $request->upi_pin;
-
-        if (!$pin || !Hash::check($pin, $sender->upi_pin)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Invalid UPI PIN',
-                'code' => 'INVALID_PIN'
-            ], 403);
-        }
 
         // Process payment
         $senderWallet = $sender->wallet;

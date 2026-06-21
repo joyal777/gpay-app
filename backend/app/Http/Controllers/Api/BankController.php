@@ -47,6 +47,7 @@ class BankController extends Controller
             'account_holder' => 'required|string',
             'bank_name' => 'nullable|string',
             'account_pin' => 'required|digits:4',
+            'initial_balance' => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -79,11 +80,13 @@ class BankController extends Controller
             'bank_name' => $request->bank_name,
             'account_pin' => Hash::make($request->account_pin),
             'is_default' => $count === 0,
+            'balance' => $request->initial_balance ?? 0.00,
         ]);
 
         return response()->json([
             'status' => true,
             'message' => 'Bank account added successfully',
+            'upi_id' => $account->upi_id,
             'account' => $this->formatAccount($account)
         ], 201);
     }
@@ -187,6 +190,7 @@ public function updatePin(Request $request, $id)
         $validator = Validator::make($request->all(), [
             'account_id' => 'required|exists:bank_accounts,id',
             'to_account_number' => 'required|string',
+            'to_upi_id' => 'nullable|string',  // Can send to UPI
             'to_ifsc_code' => 'required|string',
             'receiver_name' => 'required|string',
             'amount' => 'required|numeric|min:1|max:500000',
