@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\WalletController;
 use App\Http\Controllers\Api\BeneficiaryController;
 use App\Http\Controllers\Api\ChatController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\BankController;
 
 
 Route::get('/test', function() {
@@ -48,6 +49,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/beneficiaries', [BeneficiaryController::class, 'index']);
     Route::post('/beneficiaries', [BeneficiaryController::class, 'store']);
     Route::delete('/beneficiaries/{id}', [BeneficiaryController::class, 'destroy']);
+
+    // Bank Routes
+Route::post('/bank/account', [BankController::class, 'saveAccount']);
+Route::get('/bank/account', [BankController::class, 'getAccount']);
+Route::post('/bank/transfer', [BankController::class, 'transfer']);
+Route::get('/bank/history', [BankController::class, 'history']);
 });
 
 // Routes that ALWAYS need PIN

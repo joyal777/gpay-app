@@ -193,7 +193,69 @@ const loadChatUsers = async () => {
             <Text style={styles.balanceLabel}>Available Balance</Text>
             <Text style={styles.balanceAmount}>₹{user?.wallet?.balance || '0.00'}</Text>
           </View> */}
-            {/* People - Chat Users */}
+          {/* Quick Actions */}
+        {/* Quick Actions */}
+        <View style={styles.actionsRow}>
+        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('SendMoney')}>
+          <View style={[styles.actionIcon, { backgroundColor: '#E8F5E9' }]}>
+            <Ionicons name="send" size={26} color="#2E7D32" />
+          </View>
+          <Text style={styles.actionText}>Send Money</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Scan')}>
+          <View style={[styles.actionIcon, { backgroundColor: '#E3F2FD' }]}>
+            <Ionicons name="scan" size={26} color="#1565C0" />
+          </View>
+          <Text style={styles.actionText}>Scan & Pay</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('BankTransfer')}>
+          <View style={[styles.actionIcon, { backgroundColor: '#FFF3E0' }]}>
+            <Ionicons name="business" size={26} color="#E65100" />
+          </View>
+          <Text style={styles.actionText}>Bank Transfer</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton}>
+          <View style={[styles.actionIcon, { backgroundColor: '#FCE4EC' }]}>
+            <Ionicons name="phone-portrait" size={26} color="#C62828" />
+          </View>
+          <Text style={styles.actionText}>Mobile Recharge</Text>
+        </TouchableOpacity>
+        </View>
+
+        {/* Second Row */}
+        <View style={styles.actionsRow}>
+          <TouchableOpacity style={styles.actionButton}>
+            <View style={[styles.actionIcon, { backgroundColor: '#F3E5F5' }]}>
+              <Ionicons name="flash" size={26} color="#7B1FA2" />
+            </View>
+            <Text style={styles.actionText}>Electricity</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionButton}>
+            <View style={[styles.actionIcon, { backgroundColor: '#E0F2F1' }]}>
+              <Ionicons name="wifi" size={26} color="#00695C" />
+            </View>
+            <Text style={styles.actionText}>Broadband</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionButton}>
+            <View style={[styles.actionIcon, { backgroundColor: '#FFF9C4' }]}>
+              <Ionicons name="card" size={26} color="#F57F17" />
+            </View>
+            <Text style={styles.actionText}>Credit Card</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionButton}>
+            <View style={[styles.actionIcon, { backgroundColor: '#E8EAF6' }]}>
+              <Ionicons name="grid" size={26} color="#283593" />
+            </View>
+            <Text style={styles.actionText}>More</Text>
+          </TouchableOpacity>
+        </View>
+        {/* People - Chat Users */}
         <View style={styles.peopleSection}>
             <Text style={styles.sectionTitle}>People</Text>
             <FlatList
@@ -221,42 +283,8 @@ const loadChatUsers = async () => {
                 showsHorizontalScrollIndicator={false}
             />
         </View>
-          {/* Quick Actions */}
-          <View style={styles.actionsRow}>
-            <TouchableOpacity 
-                style={styles.actionButton}
-                onPress={() => navigation.navigate('SendMoney')}
-                >
-                <View style={[styles.actionIcon, { backgroundColor: '#e8f5e9' }]}>
-                    <Ionicons name="send" size={24} color="#2e7d32" />
-                </View>
-                <Text style={styles.actionText}>Send</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onPress={() => navigation.navigate('Scan')}
-            >
-              <View style={[styles.actionIcon, { backgroundColor: '#e3f2fd' }]}>
-                <Ionicons name="qr-code" size={24} color="#1565c0" />
-              </View>
-              <Text style={styles.actionText}>Scan</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.actionButton}>
-              <View style={[styles.actionIcon, { backgroundColor: '#fff3e0' }]}>
-                <Ionicons name="wallet" size={24} color="#e65100" />
-              </View>
-              <Text style={styles.actionText}>Add Money</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.actionButton}>
-              <View style={[styles.actionIcon, { backgroundColor: '#fce4ec' }]}>
-                <Ionicons name="card" size={24} color="#c62828" />
-              </View>
-              <Text style={styles.actionText}>Pay Bill</Text>
-            </TouchableOpacity>
-          </View>
+        
+          
 
           {/* Recent Transactions */}
           <View style={styles.transactionsSection}>
@@ -429,26 +457,27 @@ const styles = StyleSheet.create({
     color: '#1a73e8',
   },
   actionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 25,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginBottom: 16,
   },
   actionButton: {
     alignItems: 'center',
-    width: '22%',
+    width: '23%',
   },
   actionIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
   },
   actionText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#333',
     fontWeight: '500',
+    textAlign: 'center',
   },
   transactionsSection: {
     backgroundColor: '#fff',
