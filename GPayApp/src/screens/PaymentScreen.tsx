@@ -24,7 +24,6 @@ export default function PaymentScreen({ navigation, route }: any) {
 
   const [amount, setAmount] = useState(initialAmount || '');
   const [note, setNote] = useState(initialNote || '');
-  const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
   
   // Account selection
@@ -53,70 +52,73 @@ export default function PaymentScreen({ navigation, route }: any) {
     } catch (error) {}
   };
 
-  const handlePay = async () => {
-    if (!amount || parseFloat(amount) <= 0) {
-      Alert.alert('Error', 'Enter valid amount');
-      return;
-    }
-    if (!selectedAccount) {
-      Alert.alert('Error', 'Select a bank account');
-      return;
-    }
-    if (!pin || pin.length !== 4) {
-      Alert.alert('Error', 'Enter 4-digit PIN');
-      return;
-    }
+  const handlePay = () => {
+  if (!amount || parseFloat(amount) <= 0) {
+    Alert.alert('Error', 'Enter valid amount');
+    return;
+  }
+  if (savedAccounts.length === 0) {
+    Alert.alert('No Bank Account', 'Add a bank account first.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Add Account', onPress: () => navigation.navigate('AddBankAccount') },
+    ]);
+    return;
+  }
+  if (!selectedAccount) {
+    Alert.alert('Error', 'Select a bank account');
+    return;
+  }
 
-    setLoading(true);
-    try {
-      // Verify account PIN first
-      const pinRes = await api.post(`/bank/account/${selectedAccount.id}/verify-pin`, {
-        account_pin: pin,
+  // Navigate to secure PIN screen
+  navigation.navigate('SecurePin', {
+    accountId: selectedAccount.id,
+    bankName: selectedAccount.bank_name,
+    accNumber: selectedAccount.account_number,
+    amount: amount,
+    receiverName: receiverName,
+    onSuccess: (verifiedPin: string) => {
+      processPayment(verifiedPin);
+    },
+  });
+};
+
+const processPayment = async (verifiedPin: string) => {
+  setLoading(true);
+  try {
+    let response;
+
+    if (type === 'upi') {
+      response = await api.post('/wallet/send-money', {
+        upi_id: receiverUpi,
+        amount: parseFloat(amount),
+        note: note || undefined,
+        account_id: selectedAccount.id,
       });
-
-      if (!pinRes.data.status) {
-        Alert.alert('Error', 'Invalid PIN');
-        setPin('');
-        setLoading(false);
-        return;
-      }
-
-      let response;
-
-      if (type === 'upi') {
-        // UPI Payment (send money / chat payment)
-        response = await api.post('/wallet/send-money', {
-          upi_id: receiverUpi,
-          amount: parseFloat(amount),
-          note: note || undefined,
-          account_id: selectedAccount.id,
-        });
-      } else if (type === 'bank') {
-        // Bank Transfer
-        response = await api.post('/bank/transfer', {
-          account_id: selectedAccount.id,
-          to_account_number: receiverAccount,
-          to_ifsc_code: receiverIfsc,
-          receiver_name: receiverName,
-          amount: parseFloat(amount),
-          note: note || undefined,
-          account_pin: pin,
-        });
-      }
-
-      Alert.alert('Success', 'Payment successful!', [
-        { text: 'OK', onPress: () => {
-          refreshProfile?.();
-          if (onComplete) onComplete();
-          navigation.goBack();
-        }}
-      ]);
-    } catch (error: any) {
-      Alert.alert('Error', error.response?.data?.message || 'Payment failed');
-    } finally {
-      setLoading(false);
+    } else if (type === 'bank') {
+      response = await api.post('/bank/transfer', {
+        account_id: selectedAccount.id,
+        to_account_number: receiverAccount,
+        to_ifsc_code: receiverIfsc,
+        receiver_name: receiverName,
+        amount: parseFloat(amount),
+        note: note || undefined,
+        account_pin: verifiedPin,
+      });
     }
-  };
+
+    Alert.alert('Success', 'Payment successful!', [
+      { text: 'OK', onPress: () => {
+        refreshProfile?.();
+        if (onComplete) onComplete();
+        navigation.goBack();
+      }}
+    ]);
+  } catch (error: any) {
+    Alert.alert('Error', error.response?.data?.message || 'Payment failed');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -183,27 +185,13 @@ export default function PaymentScreen({ navigation, route }: any) {
           placeholderTextColor="#999"
         />
 
-        {/* PIN Input */}
-        <Text style={styles.pinLabel}>Enter Account PIN</Text>
-        <Text style={styles.pinSubtext}>
-          PIN for {selectedAccount?.bank_name || 'selected account'}
-        </Text>
-        <TextInput
-          style={styles.pinInput}
-          placeholder="••••"
-          value={pin}
-          onChangeText={setPin}
-          keyboardType="numeric"
-          maxLength={4}
-          secureTextEntry
-        />
 
         {/* Pay Button */}
         <TouchableOpacity 
-          style={[styles.payButton, (!amount || !pin || loading) && styles.payButtonDisabled]}
-          onPress={handlePay}
-          disabled={!amount || !pin || loading}
-        >
+            style={[styles.payButton, (!amount || loading) && styles.payButtonDisabled]}
+            onPress={handlePay}
+            disabled={!amount || loading}
+            >
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (

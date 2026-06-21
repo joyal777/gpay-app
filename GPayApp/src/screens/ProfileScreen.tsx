@@ -142,16 +142,7 @@ export default function ProfileScreen({ navigation }: any) {
             onPress={() => navigation.navigate('AddBankAccount')}
           >
             <Ionicons name="business-outline" size={24} color="#333" />
-            <Text style={styles.menuText}>Bank Accounts</Text>
-            <Ionicons name="chevron-forward" size={20} color="#999" />
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.menuItem}
-            onPress={() => navigation.navigate('SetPin')}
-          >
-            <Ionicons name="key-outline" size={24} color="#333" />
-            <Text style={styles.menuText}>Set UPI PIN</Text>
+            <Text style={styles.menuText}>Bank Accounts & PIN</Text>
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
 
