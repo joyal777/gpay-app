@@ -12,16 +12,12 @@ A complete Google Pay clone built with **React Native (Expo)** frontend and **La
 ## 🎥 Demo Videos
 
 ### Full App Walkthrough (3 min)
-[![Play Full Demo](https://img.icons8.com/ios-filled/100/1a73e8/play-button-circled.png)](https://raw.githubusercontent.com/joyal777/gpay-app/main/backend/public/3MIN-VIDEO.mp4)
+[![Play Walkthrough](https://img.icons8.com/ios-filled/100/1a73e8/play-button-circled.png)](https://raw.githubusercontent.com/joyal777/gpay-app/main/backend/public/3MIN-VIDEO.mp4)
 
-*(Click the play button above to watch the full walkthrough)*
-
----
+*(Click the play button – the video will be downloaded)*
 
 ### QR Code Scan in Action (3 sec)
 [![Play QR Scan](https://img.icons8.com/ios-filled/100/1a73e8/play-button-circled.png)](https://raw.githubusercontent.com/joyal777/gpay-app/main/backend/public/SHORT-VIDEO-OF-QRCODE-SCAN.mp4)
-
-*(Click the play button above to see the QR scan)*
 ---
 
 ## 🚀 Features
