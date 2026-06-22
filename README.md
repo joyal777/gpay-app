@@ -9,13 +9,13 @@ A complete Google Pay clone built with **React Native (Expo)** frontend and **La
 
 ---
 
-## 📸 Screenshots
+## 🎥 Demo Videos
 
-| Home Screen | Chat & Payments | Profile |
-|:---:|:---:|:---:|
-| ![Home](screenshots/home.png) | ![Chat](screenshots/chat.png) | ![Profile](screenshots/profile.png) |
+**Full App Walkthrough (3 min)**
+[![GPay Clone - Full Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)]
 
-*(Replace with actual screenshots)*
+**QR Code Scan in Action (3 sec)**
+[![QR Scan Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID2/0.jpg)]
 
 ---
 
