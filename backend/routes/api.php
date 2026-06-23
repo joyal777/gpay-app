@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\BeneficiaryController;
 use App\Http\Controllers\Api\ChatController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\BankController;
+use App\Http\Controllers\Api\RechargeController;
 
 
 Route::get('/test', function() {
@@ -41,7 +42,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/chat/users', [ChatController::class, 'chatUsers']);
     Route::get('/chat/{userId}', [ChatController::class, 'getChat']);
     Route::post('/chat/send', [ChatController::class, 'sendMessage']);
-    // Wallet Routes
+
+
+// Mobile Recharge Routes
+    Route::get('/recharge/plans', [RechargeController::class, 'getPlans']);
+    Route::get('/recharge/user/{userId}/network', [RechargeController::class, 'getUserNetwork']);
+    Route::post('/recharge/network', [RechargeController::class, 'saveNetwork']);
+    Route::post('/recharge', [RechargeController::class, 'recharge']);
+    Route::get('/recharge/history', [RechargeController::class, 'history']);
+    Route::get('/recharge/invoice/{id}', [RechargeController::class, 'invoice']);
+        // Wallet Routes
     Route::get('/wallet/balance', [WalletController::class, 'balance']);
     Route::get('/wallet/transactions', [WalletController::class, 'transactions']);
 
