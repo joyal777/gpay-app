@@ -19,6 +19,7 @@ import BankTransferScreen from './src/screens/BankTransferScreen';
 import AddBankAccountScreen from './src/screens/AddBankAccountScreen';
 import PaymentScreen from './src/screens/PaymentScreen';
 import SecurePinScreen from './src/screens/SecurePinScreen';
+import MobileRechargeScreen from './src/screens/MobileRechargeScreen';
 // In logged-in Stack:
 
 
@@ -54,6 +55,8 @@ function AppNavigator() {
           <Stack.Screen name="AddBankAccount" component={AddBankAccountScreen} />
           <Stack.Screen name="Payment" component={PaymentScreen} />          
           <Stack.Screen name="SecurePin" component={SecurePinScreen} />
+          
+<Stack.Screen name="MobileRecharge" component={MobileRechargeScreen} />
         </>
       ) : (
         // Not Logged In - Show Login & Register

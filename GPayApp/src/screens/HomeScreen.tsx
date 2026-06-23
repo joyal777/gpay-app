@@ -223,7 +223,7 @@ const loadChatUsers = async () => {
           <Text style={styles.actionText}>Bank Transfer</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('MobileRecharge')}>
           <View style={[styles.actionIcon, { backgroundColor: '#E3F2FD' }]}>
             <Ionicons name="phone-portrait" size={26} color="#1565C0" />
           </View>
