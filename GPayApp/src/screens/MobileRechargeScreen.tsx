@@ -104,6 +104,14 @@ export default function MobileRechargeScreen({ navigation }: any) {
     loadPlans(operator);
   };
 
+  const OPERATORS = [
+  { id: 'airtel', name: 'Airtel', color: '#E53935' },
+  { id: 'jio', name: 'Jio', color: '#1565C0' },
+  { id: 'vi', name: 'Vi', color: '#E65100' },
+  { id: 'bsnl', name: 'BSNL', color: '#2E7D32' },
+];
+
+
   const handleRecharge = () => {
     if (!selectedPlan) {
       Alert.alert('Error', 'Select a plan');
@@ -250,30 +258,53 @@ export default function MobileRechargeScreen({ navigation }: any) {
         {/* Mobile Number Input */}
         <Text style={styles.label}>Mobile Number</Text>
         <TextInput
-          style={styles.input}
-          placeholder="Enter 10-digit mobile number"
-          value={mobileNumber}
-          onChangeText={setMobileNumber}
-          keyboardType="numeric"
-          maxLength={10}
+        style={[styles.input, activeTab === 'self' && styles.disabledInput]}
+        placeholder="Enter 10-digit mobile number"
+        value={mobileNumber}
+        onChangeText={setMobileNumber}
+        keyboardType="numeric"
+        maxLength={10}
+        editable={activeTab !== 'self'}  // ← Disable editing for self
         />
 
         {/* Select Operator */}
         <Text style={styles.label}>Select Operator</Text>
+
+        {/* Locked for Self OR Others with operator */}
+        {(activeTab === 'self' || (selectedUser && selectedOperator)) ? (
+        <View style={styles.lockedOperator}>
+            <View style={[styles.operatorDot, { backgroundColor: OPERATORS.find(o => o.id === selectedOperator)?.color ?? '#1a73e8' }]} />
+            <Text style={styles.lockedOperatorText}>
+                {OPERATORS.find(o => o.id === selectedOperator)?.name?.trim() || selectedOperator?.toUpperCase()?.trim()}
+            </Text>
+            <View style={styles.lockedBadge}>
+                <Text style={styles.lockedBadgeText}>Auto</Text>
+            </View>
+            </View>
+        ) : (
+        /* Show operator selection grid - only when no operator set */
         <View style={styles.operatorRow}>
-          {OPERATORS.map((op) => (
+            {OPERATORS.map((op) => (
             <TouchableOpacity
-              key={op.id}
-              style={[styles.operatorBtn, selectedOperator === op.id && { borderColor: op.color, backgroundColor: op.color + '15' }]}
-              onPress={() => handleOperatorSelect(op.id)}
+                key={op.id}
+                style={[
+                styles.operatorBtn, 
+                selectedOperator === op.id && { 
+                    borderColor: op.color, 
+                    backgroundColor: op.color + '20',
+                    borderWidth: 2,
+                },
+                ]}
+                onPress={() => handleOperatorSelect(op.id)}
             >
-              <Ionicons name={op.icon as any} size={22} color={selectedOperator === op.id ? op.color : '#999'} />
-              <Text style={[styles.operatorText, selectedOperator === op.id && { color: op.color, fontWeight: '600' }]}>
-                {op.name}
-              </Text>
+                <View style={[styles.opDot, { backgroundColor: op.color }]} />
+                <Text style={[styles.operatorText, selectedOperator === op.id && { color: op.color, fontWeight: '600' }]}>
+                {op.name?.replace(/[^a-zA-Z]/g, '') || op.name}
+                </Text>
             </TouchableOpacity>
-          ))}
+            ))}
         </View>
+        )}
 
         {/* Plans */}
         {selectedOperator && (
@@ -360,6 +391,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', margin: 16,
     backgroundColor: '#f5f5f5', borderRadius: 12, padding: 4,
   },
+  opDot: { width: 10, height: 10, borderRadius: 5 },
   tab: {
     flex: 1, justifyContent: 'center', alignItems: 'center',
     paddingVertical: 12, borderRadius: 10,
@@ -393,6 +425,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center',
     margin: 16, padding: 12, backgroundColor: '#e8f0fe', borderRadius: 12, gap: 12,
   },
+  operatorDot: {
+   width: 12, height: 12, borderRadius: 6,
+ },
   userPic: {
     width: 40, height: 40, borderRadius: 20,
     backgroundColor: '#1a73e8', justifyContent: 'center', alignItems: 'center',
@@ -449,4 +484,26 @@ const styles = StyleSheet.create({
   historyOperator: { fontSize: 12, color: '#999', marginTop: 2 },
   historyAmount: { fontSize: 14, fontWeight: '600', color: '#1a73e8' },
   emptyText: { color: '#999', textAlign: 'center', paddingVertical: 15 },
+  disabledInput: {
+  backgroundColor: '#f0f0f0',
+  color: '#888',
+    },
+    disabledOperator: {
+    opacity: 0.5,
+    },
+    lockedOperator: {
+    flexDirection: 'row', alignItems: 'center',
+    marginHorizontal: 16, padding: 14,
+    backgroundColor: '#e8f0fe', borderRadius: 12, gap: 8,
+    },
+    lockedOperatorText: {
+    flex: 1, fontSize: 15, fontWeight: '600', color: '#1a73e8',
+    },
+    lockedBadge: {
+    backgroundColor: '#e8f5e9',
+    paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8,
+    },
+    lockedBadgeText: {
+    fontSize: 10, color: '#2e7d32', fontWeight: '600',
+    },
 });
