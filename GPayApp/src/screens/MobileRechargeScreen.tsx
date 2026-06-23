@@ -75,19 +75,28 @@ export default function MobileRechargeScreen({ navigation }: any) {
     setSearchQuery('');
     setSearchResults([]);
     setSelectedPlan(null);
+    setPlans([]);
     
     try {
-      const res = await api.get(`/recharge/user/${selected.id}/network`);
-      const userData = res.data.user;
-      setMobileNumber(userData.mobile_number_recharge || selected.phone || '');
-      if (userData.mobile_network) {
+        const res = await api.get(`/recharge/user/${selected.id}/network`);
+        const userData = res.data.user;
+        
+        // Auto-fill mobile number
+        setMobileNumber(userData.mobile_number_recharge || selected.phone || '');
+        
+        // Auto-select operator if set
+        if (userData.mobile_network) {
         setSelectedOperator(userData.mobile_network);
         loadPlans(userData.mobile_network);
-      }
+        } else {
+        setSelectedOperator('');
+        }
     } catch (error) {
-      setMobileNumber(selected.phone || '');
+        // Fallback - just use phone number
+        setMobileNumber(selected.phone || '');
+        setSelectedOperator('');
     }
-  };
+    };
 
   const handleOperatorSelect = (operator: string) => {
     setSelectedOperator(operator);
