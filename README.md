@@ -36,7 +36,7 @@ A complete Google Pay clone built with **React Native (Expo)** frontend and **La
 ### 💰 Payments
 - **Send Money** - Search users by name/phone/UPI ID
 - **Scan & Pay** - QR code scanner for instant payments
-- **Bank Transfer** - IMPS/NEFT with account verification
+- **Bank Transfer** - with account verification
 - **Chat Payments** - Send money directly in conversations
 - **Multiple Bank Accounts** - Add unlimited accounts with individual PINs
 
