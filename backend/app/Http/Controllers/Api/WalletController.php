@@ -75,13 +75,25 @@ class WalletController extends Controller
         $sender = $request->user();
         $senderWallet = $sender->wallet;
 
-        // Check balance
-        if (!$senderWallet->hasSufficientBalance($request->amount)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Insufficient balance'
-            ], 400);
+        // If account_id provided, deduct from bank account instead of wallet
+        if ($request->account_id) {
+            $bankAccount = \App\Models\BankAccount::where('user_id', $sender->id)
+                ->where('id', $request->account_id)->first();
+            if ($bankAccount) {
+                if ($bankAccount->balance < $request->amount) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Insufficient balance in selected account'
+                    ], 400);
+                }
+                $bankAccount->decrement('balance', $request->amount);
+            }
+        } else {
+            // Fallback to wallet
+            $senderWallet->debit($request->amount);
         }
+
+        // Credit receiver's wallet
 
         // Find receiver by UPI ID
         $receiverWallet = \App\Models\Wallet::where('upi_id', $request->upi_id)

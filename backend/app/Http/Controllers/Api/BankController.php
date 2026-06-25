@@ -185,12 +185,12 @@ public function updatePin(Request $request, $id)
     }
 
     // Bank transfer
+    // Bank transfer
     public function transfer(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'account_id' => 'required|exists:bank_accounts,id',
             'to_account_number' => 'required|string',
-            'to_upi_id' => 'nullable|string',  // Can send to UPI
             'to_ifsc_code' => 'required|string',
             'receiver_name' => 'required|string',
             'amount' => 'required|numeric|min:1|max:500000',
@@ -215,14 +215,23 @@ public function updatePin(Request $request, $id)
             return response()->json(['status' => false, 'message' => 'Invalid account PIN'], 403);
         }
 
-        // Check wallet balance
-        $wallet = $user->wallet;
-        if (!$wallet->hasSufficientBalance($request->amount)) {
+        // Check balance
+        if ($fromAccount->balance < $request->amount) {
             return response()->json(['status' => false, 'message' => 'Insufficient balance'], 400);
         }
 
-        // Debit wallet
-        $wallet->debit($request->amount);
+        // Find receiver's bank account
+        $toAccount = BankAccount::where('account_number', $request->to_account_number)
+            ->where('ifsc_code', strtoupper($request->to_ifsc_code))
+            ->first();
+
+        // Debit from sender
+        $fromAccount->decrement('balance', $request->amount);
+
+        // Credit to receiver (if found in our system)
+        if ($toAccount) {
+            $toAccount->increment('balance', $request->amount);
+        }
 
         // Create transfer record
         $transfer = BankTransfer::create([
@@ -237,12 +246,11 @@ public function updatePin(Request $request, $id)
 
         return response()->json([
             'status' => true,
-            'message' => 'Bank transfer successful',
+            'message' => 'Bank transfer successful' . ($toAccount ? '' : ' (External account)'),
             'transfer' => $transfer,
-            'new_balance' => $wallet->fresh()->balance,
+            'new_balance' => $fromAccount->fresh()->balance,
         ]);
     }
-
     // Transfer history
     public function history(Request $request)
     {
