@@ -9,15 +9,20 @@ A complete Google Pay clone built with **React Native (Expo)** frontend and **La
 
 ---
 
-## 🎥 Demo Videos
+## 📱 App Screenshots
 
-### Full App Walkthrough (3 min)
-[![Play Walkthrough](https://img.icons8.com/ios-filled/100/1a73e8/play-button-circled.png)](https://raw.githubusercontent.com/joyal777/gpay-app/main/backend/public/3MIN-VIDEO.mp4)
-
-*(Click the play button – the video will be downloaded)*
-
-### QR Code Scan in Action (3 sec)
-[![Play QR Scan](https://img.icons8.com/ios-filled/100/1a73e8/play-button-circled.png)](https://raw.githubusercontent.com/joyal777/gpay-app/main/backend/public/SHORT-VIDEO-OF-QRCODE-SCAN.mp4)
+<table>
+  <tr>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/3.jpeg" alt="Screenshot 1"/></td>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/1.jpeg" alt="Screenshot 2"/></td>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/11.jpeg" alt="Screenshot 3"/></td>
+  </tr>
+  <tr>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/15.jpeg" alt="Screenshot 4"/></td>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/12.jpeg" alt="Screenshot 5"/></td>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/10.jpeg" alt="Screenshot 6"/></td>
+  </tr>
+</table>
 ---
 
 ## 🚀 Features
@@ -31,9 +36,22 @@ A complete Google Pay clone built with **React Native (Expo)** frontend and **La
 ### 💰 Payments
 - **Send Money** - Search users by name/phone/UPI ID
 - **Scan & Pay** - QR code scanner for instant payments
-- **Bank Transfer** - IMPS/NEFT with account verification
+- **Bank Transfer** - with account verification
 - **Chat Payments** - Send money directly in conversations
 - **Multiple Bank Accounts** - Add unlimited accounts with individual PINs
+
+<table>
+  <tr>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/6.jpeg" alt="Screenshot 1"/></td>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/5.jpeg" alt="Screenshot 2"/></td>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/9.jpeg" alt="Screenshot 3"/></td>
+  </tr>
+  <tr>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/14.jpeg" alt="Screenshot 4"/></td>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/17.jpeg" alt="Screenshot 5"/></td>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/16.jpeg" alt="Screenshot 6"/></td>
+  </tr>
+</table>
 
 ### 🔒 Security
 - **Bank Account PIN** - Each account has its own 4-digit PIN
@@ -58,6 +76,14 @@ A complete Google Pay clone built with **React Native (Expo)** frontend and **La
 - Debit/credit indicators
 - Tap to open chat with transaction highlight
 - Pull-to-refresh updates
+
+<table>
+  <tr>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/8.jpeg" alt="Screenshot 1"/></td>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/7.jpeg" alt="Screenshot 2"/></td>
+    <td width="33%"><img src="https://github.com/joyal777/gpay-app/blob/main/backend/public/13.jpeg" alt="Screenshot 3"/></td>
+  </tr>
+</table>
 
 ---
 
