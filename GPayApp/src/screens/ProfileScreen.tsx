@@ -113,9 +113,12 @@ export default function ProfileScreen({ navigation }: any) {
 
         {/* Menu Items */}
         <View style={styles.menuSection}>
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity 
+            style={styles.menuItem}
+            onPress={() => navigation.navigate('Wallet')}
+          >
             <Ionicons name="wallet-outline" size={24} color="#333" />
-            <Text style={styles.menuText}>Wallet Balance</Text>
+            <Text style={styles.menuText}>Wallet & Accounts</Text>
             <Text style={styles.menuValue}>₹{user?.wallet?.balance || '0.00'}</Text>
           </TouchableOpacity>
 
