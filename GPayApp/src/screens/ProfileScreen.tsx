@@ -119,7 +119,7 @@ export default function ProfileScreen({ navigation }: any) {
           >
             <Ionicons name="wallet-outline" size={24} color="#333" />
             <Text style={styles.menuText}>Wallet & Accounts</Text>
-            <Text style={styles.menuValue}>₹{user?.wallet?.balance || '0.00'}</Text>
+            <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.menuItem}>
