@@ -98,11 +98,15 @@ export default function WalletScreen({ navigation }: any) {
 
   const handleAddMoney = (account: any) => {
     if (!revealedBalances[account.id]) {
-      Alert.alert('PIN Required', 'View balance first to add money');
-      return;
+        Alert.alert('PIN Required', 'View balance first to add money');
+        return;
     }
-    navigation.navigate('AddMoneyToAccount', { account });
-  };
+    // Navigate to BankTransfer with this account pre-selected for self-transfer
+    navigation.navigate('BankTransfer', { 
+        preSelectedAccount: account,
+        mode: 'add-money'
+    });
+    };
 
   const getTotalBalance = () => {
     return accounts.reduce((sum, acc) => sum + (parseFloat(acc.balance) || 0), 0);
@@ -185,7 +189,8 @@ export default function WalletScreen({ navigation }: any) {
                   style={styles.addMoneyBtn}
                   onPress={() => handleAddMoney(acc)}
                 >
-                  
+                <Ionicons name="add-circle" size={18} color="#2e7d32" />
+                <Text style={styles.addMoneyText}>Add Money</Text> 
                 </TouchableOpacity>
               )}
             </View>

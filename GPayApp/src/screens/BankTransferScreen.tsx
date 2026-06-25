@@ -10,7 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import AccountSelector from '../components/AccountSelector';
 
 
-export default function BankTransferScreen({ navigation }: any) {
+export default function BankTransferScreen({ navigation, route }: any) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'others' | 'self'>('others');
   const [accountNumber, setAccountNumber] = useState('');
@@ -20,6 +20,8 @@ export default function BankTransferScreen({ navigation }: any) {
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
+  const preSelectedAccount = route?.params?.preSelectedAccount;
+  const mode = route?.params?.mode; 
   
   // Multiple accounts
   const [savedAccounts, setSavedAccounts] = useState<any[]>([]);
@@ -29,8 +31,18 @@ export default function BankTransferScreen({ navigation }: any) {
   useEffect(() => {
     loadSavedAccounts();
     loadHistory();
-  }, []);
 
+    if (preSelectedAccount) {
+        setSelectedAccount(preSelectedAccount);
+        // Auto-fill self-transfer
+        setAccountNumber(preSelectedAccount.account_number);
+        setIfscCode(preSelectedAccount.ifsc_code);
+        setReceiverName(preSelectedAccount.account_holder);
+        setActiveTab('self');
+      }
+    }, []);
+
+  
   const loadSavedAccounts = async () => {
     try {
       const res = await api.get('/bank/accounts');
@@ -91,7 +103,9 @@ export default function BankTransferScreen({ navigation }: any) {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Bank Transfer</Text>
+        <Text style={styles.headerTitle}>
+          {mode === 'add-money' ? 'Add Money' : 'Bank Transfer'}
+        </Text>
         <View style={{ width: 24 }} />
       </View>
 
